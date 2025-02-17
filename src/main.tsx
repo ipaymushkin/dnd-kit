@@ -1,3 +1,4 @@
 import { createRoot } from 'react-dom/client';
+import Constructor from './constructor';
 
-createRoot(document.getElementById('root')!).render(<div>123</div>);
+createRoot(document.getElementById('root')!).render(<Constructor />);
