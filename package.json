@@ -15,10 +15,12 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@dnd-kit/sortable": "^10.0.0",
     "@eslint/js": "^9.19.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react-swc": "^3.5.0",
+    "classnames": "^2.5.1",
     "eslint": "^9.19.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
