@@ -37,7 +37,7 @@ import { useMountStatus } from './hooks/useMountStatus.ts';
 import { getColor } from './utils/getColor.ts';
 
 import { useCollisionDetectionStrategy } from './hooks/useCollisionDetectionStrategy.ts';
-import { PLACEHOLDER_ID } from './const.ts';
+import { PLACEHOLDER_ID, TRASH_ID } from './const.ts';
 
 const animateLayoutChanges: AnimateLayoutChanges = args =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
@@ -139,8 +139,6 @@ interface Props {
   scrollable?: boolean;
   vertical?: boolean;
 }
-
-export const TRASH_ID = 'void';
 
 export const Constructor = ({
   adjustScale = false,

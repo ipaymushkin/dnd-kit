@@ -6,7 +6,7 @@ import {
   rectIntersection,
 } from '@dnd-kit/core';
 import { useCallback } from 'react';
-import { TRASH_ID } from '../index.tsx';
+import { TRASH_ID } from '../const.ts';
 
 export const useCollisionDetectionStrategy = ({
   activeId,
