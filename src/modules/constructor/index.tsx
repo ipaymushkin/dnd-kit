@@ -1,15 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal, unstable_batchedUpdates } from 'react-dom';
 import {
-  CancelDrop,
   defaultDropAnimationSideEffects,
   DndContext,
   DragOverlay,
   DropAnimation,
-  KeyboardCoordinateGetter,
   KeyboardSensor,
   MeasuringStrategy,
-  Modifiers,
   MouseSensor,
   TouchSensor,
   UniqueIdentifier,
@@ -34,6 +31,7 @@ import { useCollisionDetectionStrategy } from './hooks/useCollisionDetectionStra
 import { PLACEHOLDER_ID, TRASH_ID } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
+import { ConstructorInterface, Items } from '../../config/types.ts';
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -45,46 +43,17 @@ const dropAnimation: DropAnimation = {
   }),
 };
 
-type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
-
-interface Props {
-  adjustScale?: boolean;
-  cancelDrop?: CancelDrop;
-  columns?: number;
-  containerStyle?: React.CSSProperties;
-  coordinateGetter?: KeyboardCoordinateGetter;
-  getItemStyles?: (args: {
-    value: UniqueIdentifier;
-    index: number;
-    overIndex: number;
-    isDragging: boolean;
-    containerId: UniqueIdentifier;
-    isSorting: boolean;
-    isDragOverlay: boolean;
-  }) => React.CSSProperties;
-  wrapperStyle?: (args: { index: number }) => React.CSSProperties;
-  itemCount?: number;
-  items?: Items;
-  handle?: boolean;
-  renderItem?: any;
-  modifiers?: Modifiers;
-  trashable?: boolean;
-  scrollable?: boolean;
-}
-
 export const Constructor = ({
-  adjustScale = false,
   cancelDrop,
   columns,
   handle = false,
   containerStyle,
-  coordinateGetter = multipleContainersCoordinateGetter,
   getItemStyles = () => ({}),
   wrapperStyle = () => ({}),
   modifiers,
   renderItem,
   scrollable,
-}: Props) => {
+}: ConstructorInterface) => {
   const [items, setItems] = useState<Items>({
     A: createRange(3, index => `A${index + 1}`),
     B: createRange(4, index => `B${index + 1}`),
@@ -113,7 +82,7 @@ export const Constructor = ({
     useSensor(MouseSensor),
     useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter,
+      coordinateGetter: multipleContainersCoordinateGetter,
     }),
   );
 
@@ -415,7 +384,7 @@ export const Constructor = ({
         </SortableContext>
       </div>
       {createPortal(
-        <DragOverlay adjustScale={adjustScale} dropAnimation={dropAnimation}>
+        <DragOverlay dropAnimation={dropAnimation}>
           {activeId
             ? containers.includes(activeId)
               ? renderContainerDragOverlay(activeId)
