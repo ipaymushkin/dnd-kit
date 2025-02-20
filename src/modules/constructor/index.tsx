@@ -28,10 +28,14 @@ import { createRange } from './utils/createRange.ts';
 import { getColor } from './utils/getColor.ts';
 
 import { useCollisionDetectionStrategy } from './hooks/useCollisionDetectionStrategy.ts';
-import { PLACEHOLDER_ID, TRASH_ID } from './const.ts';
+import { otherColumnsValue, PLACEHOLDER_ID, TRASH_ID } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
-import { ConstructorInterface, Items } from '../../config/types.ts';
+import {
+  ConfigInterface,
+  ConstructorInterface,
+  Items,
+} from '../../config/types.ts';
 import styled from 'styled-components';
 
 const dropAnimation: DropAnimation = {
@@ -53,13 +57,16 @@ export const Constructor = ({
   modifiers,
   renderItem,
   scrollable,
-}: ConstructorInterface) => {
-  const [items, setItems] = useState<Items>({
-    A: createRange(3, index => `A${index + 1}`),
-    B: createRange(4, index => `B${index + 1}`),
-    C: createRange(1, index => `C${index + 1}`),
-    D: createRange(2, index => `D${index + 1}`),
-  });
+  meta,
+}: ConstructorInterface & { meta: ConfigInterface }) => {
+  const [items, setItems] = useState<any>(
+    meta.columns.reduce((previousValue, currentValue) => {
+      return Object.assign(previousValue, {
+        [`${currentValue.value ?? otherColumnsValue}`]: [],
+      });
+    }, {}),
+  );
+
   const [containers, setContainers] = useState(
     Object.keys(items) as UniqueIdentifier[],
   );
@@ -334,44 +341,50 @@ export const Constructor = ({
       onDragCancel={onDragCancel}
       modifiers={modifiers}
     >
-      <Wrapper>
+      <Wrapper columns={meta.columns.length}>
         <SortableContext
           items={[...containers, PLACEHOLDER_ID]}
           strategy={horizontalListSortingStrategy}
         >
-          {containers.map(containerId => (
-            <DroppableContainer
-              key={containerId}
-              id={containerId}
-              label={`Column ${containerId}`}
-              items={items[containerId]}
-              scrollable={scrollable}
-              style={containerStyle}
-              onRemove={() => handleRemove(containerId)}
-            >
-              <SortableContext
+          {containers.map(containerId => {
+            // const containerMeta =
+            //   containerId === otherColumnsValue
+            //     ? meta.columns.find(el => el.isCollectively)
+            //     : meta.columns.find(el => el.value === containerId);
+            return (
+              <DroppableContainer
+                key={containerId}
+                id={containerId}
+                label={`Column ${containerId}`}
                 items={items[containerId]}
-                strategy={verticalListSortingStrategy}
+                scrollable={scrollable}
+                style={containerStyle}
+                onRemove={() => handleRemove(containerId)}
               >
-                {items[containerId].map((value, index) => {
-                  return (
-                    <SortableItem
-                      disabled={isSortingContainer}
-                      key={value}
-                      id={value}
-                      index={index}
-                      handle={handle}
-                      style={getItemStyles}
-                      wrapperStyle={wrapperStyle}
-                      renderItem={renderItem}
-                      containerId={containerId}
-                      getIndex={getIndex}
-                    />
-                  );
-                })}
-              </SortableContext>
-            </DroppableContainer>
-          ))}
+                <SortableContext
+                  items={items[containerId]}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {items[containerId].map((value, index) => {
+                    return (
+                      <SortableItem
+                        disabled={isSortingContainer}
+                        key={value}
+                        id={value}
+                        index={index}
+                        handle={handle}
+                        style={getItemStyles}
+                        wrapperStyle={wrapperStyle}
+                        renderItem={renderItem}
+                        containerId={containerId}
+                        getIndex={getIndex}
+                      />
+                    );
+                  })}
+                </SortableContext>
+              </DroppableContainer>
+            );
+          })}
         </SortableContext>
       </Wrapper>
       {createPortal(
@@ -388,9 +401,8 @@ export const Constructor = ({
   );
 };
 
-const Wrapper = styled.div`
-  display: inline-grid;
-  box-sizing: border-box;
+const Wrapper = styled.div<{ columns: number }>`
+  display: grid;
   padding: 20px;
-  grid-auto-flow: column;
+  grid-template-columns: repeat(${({ columns }) => columns}, 1fr);
 `;
