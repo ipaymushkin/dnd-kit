@@ -17,88 +17,23 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {
-  AnimateLayoutChanges,
   arrayMove,
-  defaultAnimateLayoutChanges,
   horizontalListSortingStrategy,
   SortableContext,
-  SortingStrategy,
-  useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { coordinateGetter as multipleContainersCoordinateGetter } from './utils/coordinateGetter.ts';
 
 import { Item } from './components/Item';
-import { Container, ContainerProps } from './components/Container';
+import { Container } from './components/Container';
 
 import { createRange } from './utils/createRange.ts';
-import { useMountStatus } from './hooks/useMountStatus.ts';
 import { getColor } from './utils/getColor.ts';
 
 import { useCollisionDetectionStrategy } from './hooks/useCollisionDetectionStrategy.ts';
 import { PLACEHOLDER_ID, TRASH_ID } from './const.ts';
-
-const animateLayoutChanges: AnimateLayoutChanges = args =>
-  defaultAnimateLayoutChanges({ ...args, wasDragging: true });
-
-const DroppableContainer = ({
-  children,
-  columns = 1,
-  disabled,
-  id,
-  items,
-  style,
-  ...props
-}: ContainerProps & {
-  disabled?: boolean;
-  id: UniqueIdentifier;
-  items: UniqueIdentifier[];
-  style?: React.CSSProperties;
-}) => {
-  const {
-    active,
-    attributes,
-    isDragging,
-    listeners,
-    over,
-    setNodeRef,
-    transition,
-    transform,
-  } = useSortable({
-    id,
-    data: {
-      type: 'container',
-      children: items,
-    },
-    animateLayoutChanges,
-  });
-  const isOverContainer = over
-    ? (id === over.id && active?.data.current?.type !== 'container') ||
-      items.includes(over.id)
-    : false;
-
-  return (
-    <Container
-      ref={disabled ? undefined : setNodeRef}
-      style={{
-        ...style,
-        transition,
-        transform: CSS.Translate.toString(transform),
-        opacity: isDragging ? 0.5 : undefined,
-      }}
-      hover={isOverContainer}
-      handleProps={{
-        ...attributes,
-        ...listeners,
-      }}
-      columns={columns}
-      {...props}
-    >
-      {children}
-    </Container>
-  );
-};
+import { DroppableContainer } from './components/DroppableContainer';
+import { SortableItem } from './components/SortableItem';
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -343,6 +278,72 @@ export const Constructor = ({
     setActiveId(null);
   };
 
+  const renderSortableItemDragOverlay = (id: UniqueIdentifier) => {
+    return (
+      <Item
+        value={id}
+        handle={handle}
+        style={getItemStyles({
+          containerId: findContainer(id) as UniqueIdentifier,
+          overIndex: -1,
+          index: getIndex(id),
+          value: id,
+          isSorting: true,
+          isDragging: true,
+          isDragOverlay: true,
+        })}
+        color={getColor(id)}
+        wrapperStyle={wrapperStyle({ index: 0 })}
+        renderItem={renderItem}
+        dragOverlay
+      />
+    );
+  };
+
+  const renderContainerDragOverlay = (containerId: UniqueIdentifier) => {
+    return (
+      <Container
+        label={`Column ${containerId}`}
+        columns={columns}
+        style={{
+          height: '100%',
+        }}
+        shadow
+      >
+        {items[containerId].map((item, index) => (
+          <Item
+            key={item}
+            value={item}
+            handle={handle}
+            style={getItemStyles({
+              containerId,
+              overIndex: -1,
+              index: getIndex(item),
+              value: item,
+              isDragging: false,
+              isSorting: false,
+              isDragOverlay: false,
+            })}
+            color={getColor(item)}
+            wrapperStyle={wrapperStyle({ index })}
+            renderItem={renderItem}
+          />
+        ))}
+      </Container>
+    );
+  };
+
+  const handleRemove = (containerID: UniqueIdentifier) => {
+    setContainers(containers => containers.filter(id => id !== containerID));
+  };
+
+  const getNextContainerId = () => {
+    const containerIds = Object.keys(items);
+    const lastContainerId = containerIds[containerIds.length - 1];
+
+    return String.fromCharCode(lastContainerId.charCodeAt(0) + 1);
+  };
+
   useEffect(() => {
     requestAnimationFrame(() => {
       recentlyMovedToNewContainer.current = false;
@@ -425,138 +426,4 @@ export const Constructor = ({
       )}
     </DndContext>
   );
-
-  function renderSortableItemDragOverlay(id: UniqueIdentifier) {
-    return (
-      <Item
-        value={id}
-        handle={handle}
-        style={getItemStyles({
-          containerId: findContainer(id) as UniqueIdentifier,
-          overIndex: -1,
-          index: getIndex(id),
-          value: id,
-          isSorting: true,
-          isDragging: true,
-          isDragOverlay: true,
-        })}
-        color={getColor(id)}
-        wrapperStyle={wrapperStyle({ index: 0 })}
-        renderItem={renderItem}
-        dragOverlay
-      />
-    );
-  }
-
-  function renderContainerDragOverlay(containerId: UniqueIdentifier) {
-    return (
-      <Container
-        label={`Column ${containerId}`}
-        columns={columns}
-        style={{
-          height: '100%',
-        }}
-        shadow
-        unstyled={false}
-      >
-        {items[containerId].map((item, index) => (
-          <Item
-            key={item}
-            value={item}
-            handle={handle}
-            style={getItemStyles({
-              containerId,
-              overIndex: -1,
-              index: getIndex(item),
-              value: item,
-              isDragging: false,
-              isSorting: false,
-              isDragOverlay: false,
-            })}
-            color={getColor(item)}
-            wrapperStyle={wrapperStyle({ index })}
-            renderItem={renderItem}
-          />
-        ))}
-      </Container>
-    );
-  }
-
-  function handleRemove(containerID: UniqueIdentifier) {
-    setContainers(containers => containers.filter(id => id !== containerID));
-  }
-
-  function getNextContainerId() {
-    const containerIds = Object.keys(items);
-    const lastContainerId = containerIds[containerIds.length - 1];
-
-    return String.fromCharCode(lastContainerId.charCodeAt(0) + 1);
-  }
 };
-
-interface SortableItemProps {
-  containerId: UniqueIdentifier;
-  id: UniqueIdentifier;
-  index: number;
-  handle: boolean;
-  disabled?: boolean;
-  style(args: any): React.CSSProperties;
-  getIndex(id: UniqueIdentifier): number;
-  renderItem(): React.ReactElement;
-  wrapperStyle({ index }: { index: number }): React.CSSProperties;
-}
-
-function SortableItem({
-  disabled,
-  id,
-  index,
-  handle,
-  renderItem,
-  style,
-  containerId,
-  getIndex,
-  wrapperStyle,
-}: SortableItemProps) {
-  const {
-    setNodeRef,
-    setActivatorNodeRef,
-    listeners,
-    isDragging,
-    isSorting,
-    over,
-    overIndex,
-    transform,
-    transition,
-  } = useSortable({
-    id,
-  });
-  const mounted = useMountStatus();
-  const mountedWhileDragging = isDragging && !mounted;
-
-  return (
-    <Item
-      ref={disabled ? undefined : setNodeRef}
-      value={id}
-      dragging={isDragging}
-      sorting={isSorting}
-      handle={handle}
-      handleProps={handle ? { ref: setActivatorNodeRef } : undefined}
-      index={index}
-      wrapperStyle={wrapperStyle({ index })}
-      style={style({
-        index,
-        value: id,
-        isDragging,
-        isSorting,
-        overIndex: over ? getIndex(over.id) : overIndex,
-        containerId,
-      })}
-      color={getColor(id)}
-      transition={transition}
-      transform={transform}
-      fadeIn={mountedWhileDragging}
-      listeners={listeners}
-      renderItem={renderItem}
-    />
-  );
-}
