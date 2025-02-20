@@ -132,12 +132,10 @@ interface Props {
   items?: Items;
   handle?: boolean;
   renderItem?: any;
-  strategy?: SortingStrategy;
   modifiers?: Modifiers;
   minimal?: boolean;
   trashable?: boolean;
   scrollable?: boolean;
-  vertical?: boolean;
 }
 
 export const Constructor = ({
@@ -152,8 +150,6 @@ export const Constructor = ({
   minimal = false,
   modifiers,
   renderItem,
-  strategy = verticalListSortingStrategy,
-  vertical = false,
   scrollable,
 }: Props) => {
   const [items, setItems] = useState<Items>({
@@ -376,16 +372,12 @@ export const Constructor = ({
           display: 'inline-grid',
           boxSizing: 'border-box',
           padding: 20,
-          gridAutoFlow: vertical ? 'row' : 'column',
+          gridAutoFlow: 'column',
         }}
       >
         <SortableContext
           items={[...containers, PLACEHOLDER_ID]}
-          strategy={
-            vertical
-              ? verticalListSortingStrategy
-              : horizontalListSortingStrategy
-          }
+          strategy={horizontalListSortingStrategy}
         >
           {containers.map(containerId => (
             <DroppableContainer
@@ -399,7 +391,10 @@ export const Constructor = ({
               unstyled={minimal}
               onRemove={() => handleRemove(containerId)}
             >
-              <SortableContext items={items[containerId]} strategy={strategy}>
+              <SortableContext
+                items={items[containerId]}
+                strategy={verticalListSortingStrategy}
+              >
                 {items[containerId].map((value, index) => {
                   return (
                     <SortableItem
