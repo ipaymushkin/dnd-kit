@@ -2,29 +2,29 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal, unstable_batchedUpdates } from 'react-dom';
 import {
   CancelDrop,
+  defaultDropAnimationSideEffects,
   DndContext,
   DragOverlay,
   DropAnimation,
+  KeyboardCoordinateGetter,
   KeyboardSensor,
+  MeasuringStrategy,
+  Modifiers,
   MouseSensor,
   TouchSensor,
-  Modifiers,
   UniqueIdentifier,
-  useSensors,
   useSensor,
-  MeasuringStrategy,
-  KeyboardCoordinateGetter,
-  defaultDropAnimationSideEffects,
+  useSensors,
 } from '@dnd-kit/core';
 import {
   AnimateLayoutChanges,
-  SortableContext,
-  useSortable,
   arrayMove,
   defaultAnimateLayoutChanges,
-  verticalListSortingStrategy,
-  SortingStrategy,
   horizontalListSortingStrategy,
+  SortableContext,
+  SortingStrategy,
+  useSortable,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { coordinateGetter as multipleContainersCoordinateGetter } from './utils/coordinateGetter.ts';
@@ -37,6 +37,7 @@ import { useMountStatus } from './hooks/useMountStatus.ts';
 import { getColor } from './utils/getColor.ts';
 
 import { useCollisionDetectionStrategy } from './hooks/useCollisionDetectionStrategy.ts';
+import { PLACEHOLDER_ID } from './const.ts';
 
 const animateLayoutChanges: AnimateLayoutChanges = args =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
@@ -140,7 +141,6 @@ interface Props {
 }
 
 export const TRASH_ID = 'void';
-const PLACEHOLDER_ID = 'placeholder';
 
 export const Constructor = ({
   adjustScale = false,
@@ -205,20 +205,150 @@ export const Constructor = ({
       return -1;
     }
 
-    const index = items[container].indexOf(id);
-
-    return index;
+    return items[container].indexOf(id);
   };
 
   const onDragCancel = () => {
     if (clonedItems) {
-      // Reset items to their original state in case items have been
-      // Dragged across containers
       setItems(clonedItems);
     }
 
     setActiveId(null);
     setClonedItems(null);
+  };
+
+  const onDragStart = ({ active }: any) => {
+    setActiveId(active.id);
+    setClonedItems(items);
+  };
+
+  const onDragOver = ({ active, over }: any) => {
+    const overId = over?.id;
+
+    if (overId == null || overId === TRASH_ID || active.id in items) {
+      return;
+    }
+
+    const overContainer = findContainer(overId);
+    const activeContainer = findContainer(active.id);
+
+    if (!overContainer || !activeContainer) {
+      return;
+    }
+
+    if (activeContainer !== overContainer) {
+      setItems(items => {
+        const activeItems = items[activeContainer];
+        const overItems = items[overContainer];
+        const overIndex = overItems.indexOf(overId);
+        const activeIndex = activeItems.indexOf(active.id);
+
+        let newIndex: number;
+
+        if (overId in items) {
+          newIndex = overItems.length + 1;
+        } else {
+          const isBelowOverItem =
+            over &&
+            active.rect.current.translated &&
+            active.rect.current.translated.top >
+              over.rect.top + over.rect.height;
+
+          const modifier = isBelowOverItem ? 1 : 0;
+
+          newIndex =
+            overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
+        }
+
+        recentlyMovedToNewContainer.current = true;
+
+        return {
+          ...items,
+          [activeContainer]: items[activeContainer].filter(
+            item => item !== active.id,
+          ),
+          [overContainer]: [
+            ...items[overContainer].slice(0, newIndex),
+            items[activeContainer][activeIndex],
+            ...items[overContainer].slice(
+              newIndex,
+              items[overContainer].length,
+            ),
+          ],
+        };
+      });
+    }
+  };
+
+  const onDragEnd = ({ active, over }: any) => {
+    if (active.id in items && over?.id) {
+      setContainers(containers => {
+        const activeIndex = containers.indexOf(active.id);
+        const overIndex = containers.indexOf(over.id);
+
+        return arrayMove(containers, activeIndex, overIndex);
+      });
+    }
+
+    const activeContainer = findContainer(active.id);
+
+    if (!activeContainer) {
+      setActiveId(null);
+      return;
+    }
+
+    const overId = over?.id;
+
+    if (overId == null) {
+      setActiveId(null);
+      return;
+    }
+
+    if (overId === TRASH_ID) {
+      setItems(items => ({
+        ...items,
+        [activeContainer]: items[activeContainer].filter(id => id !== activeId),
+      }));
+      setActiveId(null);
+      return;
+    }
+
+    if (overId === PLACEHOLDER_ID) {
+      const newContainerId = getNextContainerId();
+
+      unstable_batchedUpdates(() => {
+        setContainers(containers => [...containers, newContainerId]);
+        setItems(items => ({
+          ...items,
+          [activeContainer]: items[activeContainer].filter(
+            id => id !== activeId,
+          ),
+          [newContainerId]: [active.id],
+        }));
+        setActiveId(null);
+      });
+      return;
+    }
+
+    const overContainer = findContainer(overId);
+
+    if (overContainer) {
+      const activeIndex = items[activeContainer].indexOf(active.id);
+      const overIndex = items[overContainer].indexOf(overId);
+
+      if (activeIndex !== overIndex) {
+        setItems(items => ({
+          ...items,
+          [overContainer]: arrayMove(
+            items[overContainer],
+            activeIndex,
+            overIndex,
+          ),
+        }));
+      }
+    }
+
+    setActiveId(null);
   };
 
   useEffect(() => {
@@ -236,139 +366,9 @@ export const Constructor = ({
           strategy: MeasuringStrategy.Always,
         },
       }}
-      onDragStart={({ active }) => {
-        setActiveId(active.id);
-        setClonedItems(items);
-      }}
-      onDragOver={({ active, over }) => {
-        const overId = over?.id;
-
-        if (overId == null || overId === TRASH_ID || active.id in items) {
-          return;
-        }
-
-        const overContainer = findContainer(overId);
-        const activeContainer = findContainer(active.id);
-
-        if (!overContainer || !activeContainer) {
-          return;
-        }
-
-        if (activeContainer !== overContainer) {
-          setItems(items => {
-            const activeItems = items[activeContainer];
-            const overItems = items[overContainer];
-            const overIndex = overItems.indexOf(overId);
-            const activeIndex = activeItems.indexOf(active.id);
-
-            let newIndex: number;
-
-            if (overId in items) {
-              newIndex = overItems.length + 1;
-            } else {
-              const isBelowOverItem =
-                over &&
-                active.rect.current.translated &&
-                active.rect.current.translated.top >
-                  over.rect.top + over.rect.height;
-
-              const modifier = isBelowOverItem ? 1 : 0;
-
-              newIndex =
-                overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
-            }
-
-            recentlyMovedToNewContainer.current = true;
-
-            return {
-              ...items,
-              [activeContainer]: items[activeContainer].filter(
-                item => item !== active.id,
-              ),
-              [overContainer]: [
-                ...items[overContainer].slice(0, newIndex),
-                items[activeContainer][activeIndex],
-                ...items[overContainer].slice(
-                  newIndex,
-                  items[overContainer].length,
-                ),
-              ],
-            };
-          });
-        }
-      }}
-      onDragEnd={({ active, over }) => {
-        if (active.id in items && over?.id) {
-          setContainers(containers => {
-            const activeIndex = containers.indexOf(active.id);
-            const overIndex = containers.indexOf(over.id);
-
-            return arrayMove(containers, activeIndex, overIndex);
-          });
-        }
-
-        const activeContainer = findContainer(active.id);
-
-        if (!activeContainer) {
-          setActiveId(null);
-          return;
-        }
-
-        const overId = over?.id;
-
-        if (overId == null) {
-          setActiveId(null);
-          return;
-        }
-
-        if (overId === TRASH_ID) {
-          setItems(items => ({
-            ...items,
-            [activeContainer]: items[activeContainer].filter(
-              id => id !== activeId,
-            ),
-          }));
-          setActiveId(null);
-          return;
-        }
-
-        if (overId === PLACEHOLDER_ID) {
-          const newContainerId = getNextContainerId();
-
-          unstable_batchedUpdates(() => {
-            setContainers(containers => [...containers, newContainerId]);
-            setItems(items => ({
-              ...items,
-              [activeContainer]: items[activeContainer].filter(
-                id => id !== activeId,
-              ),
-              [newContainerId]: [active.id],
-            }));
-            setActiveId(null);
-          });
-          return;
-        }
-
-        const overContainer = findContainer(overId);
-
-        if (overContainer) {
-          const activeIndex = items[activeContainer].indexOf(active.id);
-          const overIndex = items[overContainer].indexOf(overId);
-
-          if (activeIndex !== overIndex) {
-            setItems(items => ({
-              ...items,
-              [overContainer]: arrayMove(
-                items[overContainer],
-                activeIndex,
-                overIndex,
-              ),
-            }));
-          }
-        }
-
-        setActiveId(null);
-      }}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragEnd={onDragEnd}
       cancelDrop={cancelDrop}
       onDragCancel={onDragCancel}
       modifiers={modifiers}
