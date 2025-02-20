@@ -1,4 +1,9 @@
-import { CancelDrop, Modifiers, UniqueIdentifier } from '@dnd-kit/core';
+import {
+  CancelDrop,
+  type DraggableSyntheticListeners,
+  Modifiers,
+  UniqueIdentifier,
+} from '@dnd-kit/core';
 import React, { ReactNode } from 'react';
 
 export interface ConfigColumnInterface {
@@ -34,7 +39,7 @@ export interface ConstructorInterface {
   }) => React.CSSProperties;
   wrapperStyle?: (args: { index: number }) => React.CSSProperties;
   handle?: boolean;
-  renderItem?: (data: any) => ReactNode;
+  renderItem?: any;
   modifiers?: Modifiers;
   scrollable?: boolean;
 }

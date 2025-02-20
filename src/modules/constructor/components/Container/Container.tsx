@@ -41,6 +41,8 @@ export const Container = forwardRef<HTMLDivElement, Props>(
   ) => {
     const Component = onClick ? 'button' : 'div';
 
+    console.log(style);
+
     return (
       <Component
         {...props}

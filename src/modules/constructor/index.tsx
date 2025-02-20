@@ -32,6 +32,7 @@ import { PLACEHOLDER_ID, TRASH_ID } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
 import { ConstructorInterface, Items } from '../../config/types.ts';
+import styled from 'styled-components';
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -335,14 +336,7 @@ export const Constructor = ({
       onDragCancel={onDragCancel}
       modifiers={modifiers}
     >
-      <div
-        style={{
-          display: 'inline-grid',
-          boxSizing: 'border-box',
-          padding: 20,
-          gridAutoFlow: 'column',
-        }}
-      >
+      <Wrapper>
         <SortableContext
           items={[...containers, PLACEHOLDER_ID]}
           strategy={horizontalListSortingStrategy}
@@ -382,7 +376,7 @@ export const Constructor = ({
             </DroppableContainer>
           ))}
         </SortableContext>
-      </div>
+      </Wrapper>
       {createPortal(
         <DragOverlay dropAnimation={dropAnimation}>
           {activeId
@@ -396,3 +390,10 @@ export const Constructor = ({
     </DndContext>
   );
 };
+
+const Wrapper = styled.div`
+  display: inline-grid;
+  box-sizing: border-box;
+  padding: 20px;
+  grid-auto-flow: column;
+`;
