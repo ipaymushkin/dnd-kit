@@ -1,15 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal, unstable_batchedUpdates } from 'react-dom';
 import {
   CancelDrop,
-  closestCenter,
-  pointerWithin,
-  rectIntersection,
-  CollisionDetection,
   DndContext,
   DragOverlay,
   DropAnimation,
-  getFirstCollision,
   KeyboardSensor,
   MouseSensor,
   TouchSensor,
@@ -41,7 +36,6 @@ import { createRange } from './utils/createRange.ts';
 import { useMountStatus } from './hooks/useMountStatus.ts';
 import { getColor } from './utils/getColor.ts';
 
-import './style.module.css';
 import { useCollisionDetectionStrategy } from './hooks/useCollisionDetectionStrategy.ts';
 
 const animateLayoutChanges: AnimateLayoutChanges = args =>
