@@ -7,7 +7,6 @@ import styles from './Container.module.css';
 
 export interface Props {
   children: React.ReactNode;
-  columns?: number;
   label?: string;
   style?: React.CSSProperties;
   horizontal?: boolean;
@@ -24,7 +23,6 @@ export const Container = forwardRef<HTMLDivElement, Props>(
   (
     {
       children,
-      columns = 1,
       handleProps,
       horizontal,
       hover,
@@ -48,7 +46,7 @@ export const Container = forwardRef<HTMLDivElement, Props>(
         style={
           {
             ...style,
-            '--columns': columns,
+            '--columns': 1,
           } as React.CSSProperties
         }
         className={classNames(

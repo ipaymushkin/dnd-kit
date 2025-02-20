@@ -26,7 +26,6 @@ export type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
 
 export interface ConstructorInterface {
   cancelDrop?: CancelDrop;
-  columns?: number;
   containerStyle?: React.CSSProperties;
   getItemStyles?: (args: {
     value: UniqueIdentifier;

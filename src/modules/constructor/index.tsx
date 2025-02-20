@@ -46,7 +46,6 @@ const dropAnimation: DropAnimation = {
 
 export const Constructor = ({
   cancelDrop,
-  columns,
   handle = false,
   containerStyle,
   getItemStyles = () => ({}),
@@ -274,7 +273,6 @@ export const Constructor = ({
     return (
       <Container
         label={`Column ${containerId}`}
-        columns={columns}
         style={{
           height: '100%',
         }}
@@ -346,7 +344,6 @@ export const Constructor = ({
               key={containerId}
               id={containerId}
               label={`Column ${containerId}`}
-              columns={columns}
               items={items[containerId]}
               scrollable={scrollable}
               style={containerStyle}

@@ -1,4 +1,4 @@
 import { createRoot } from 'react-dom/client';
-import { Constructor } from './modules/constructor';
+import App from './App.tsx';
 
-createRoot(document.getElementById('root')!).render(<Constructor />);
+createRoot(document.getElementById('root')!).render(<App />);
