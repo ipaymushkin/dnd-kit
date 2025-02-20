@@ -133,7 +133,6 @@ interface Props {
   handle?: boolean;
   renderItem?: any;
   modifiers?: Modifiers;
-  minimal?: boolean;
   trashable?: boolean;
   scrollable?: boolean;
 }
@@ -147,7 +146,6 @@ export const Constructor = ({
   coordinateGetter = multipleContainersCoordinateGetter,
   getItemStyles = () => ({}),
   wrapperStyle = () => ({}),
-  minimal = false,
   modifiers,
   renderItem,
   scrollable,
@@ -383,12 +381,11 @@ export const Constructor = ({
             <DroppableContainer
               key={containerId}
               id={containerId}
-              label={minimal ? undefined : `Column ${containerId}`}
+              label={`Column ${containerId}`}
               columns={columns}
               items={items[containerId]}
               scrollable={scrollable}
               style={containerStyle}
-              unstyled={minimal}
               onRemove={() => handleRemove(containerId)}
             >
               <SortableContext

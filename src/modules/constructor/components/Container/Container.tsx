@@ -1,7 +1,7 @@
-import React, {forwardRef} from 'react';
+import React, { forwardRef } from 'react';
 import classNames from 'classnames';
 
-import {Handle, Remove} from '../Item';
+import { Handle, Remove } from '../Item';
 
 import styles from './Container.module.css';
 
@@ -16,7 +16,6 @@ export interface Props {
   scrollable?: boolean;
   shadow?: boolean;
   placeholder?: boolean;
-  unstyled?: boolean;
   onClick?(): void;
   onRemove?(): void;
 }
@@ -36,10 +35,9 @@ export const Container = forwardRef<HTMLDivElement, Props>(
       style,
       scrollable,
       shadow,
-      unstyled,
       ...props
     }: Props,
-    ref
+    ref,
   ) => {
     const Component = onClick ? 'button' : 'div';
 
@@ -55,12 +53,11 @@ export const Container = forwardRef<HTMLDivElement, Props>(
         }
         className={classNames(
           styles.Container,
-          unstyled && styles.unstyled,
           horizontal && styles.horizontal,
           hover && styles.hover,
           placeholder && styles.placeholder,
           scrollable && styles.scrollable,
-          shadow && styles.shadow
+          shadow && styles.shadow,
         )}
         onClick={onClick}
         tabIndex={onClick ? 0 : undefined}
@@ -77,5 +74,5 @@ export const Container = forwardRef<HTMLDivElement, Props>(
         {placeholder ? children : <ul>{children}</ul>}
       </Component>
     );
-  }
+  },
 );
