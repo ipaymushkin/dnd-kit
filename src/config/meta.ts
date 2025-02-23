@@ -2,22 +2,23 @@ import { ConfigInterface } from './types.ts';
 
 export const meta: ConfigInterface = {
   columnField: 'status',
+  itemUniqKey: 'id',
   columns: [
     {
       label: 'Первая колонка',
-      value: 0,
+      value: 'first',
     },
     {
       label: 'Вторая колонка',
-      value: 1,
+      value: 'second',
     },
     {
       label: 'Третья колонка',
-      value: 2,
+      value: 'third',
     },
     {
       label: 'Четвертая колонка',
-      value: 3,
+      value: 'fourth',
     },
     {
       label: 'Остальные',

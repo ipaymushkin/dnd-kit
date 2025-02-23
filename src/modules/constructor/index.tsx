@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal, unstable_batchedUpdates } from 'react-dom';
 import {
   defaultDropAnimationSideEffects,
@@ -20,15 +20,13 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { coordinateGetter as multipleContainersCoordinateGetter } from './utils/coordinateGetter.ts';
+import { groupBy } from 'lodash';
 
 import { Item } from './components/Item';
 import { Container } from './components/Container';
 
-import { createRange } from './utils/createRange.ts';
-import { getColor } from './utils/getColor.ts';
-
 import { useCollisionDetectionStrategy } from './hooks/useCollisionDetectionStrategy.ts';
-import { otherColumnsValue, PLACEHOLDER_ID, TRASH_ID } from './const.ts';
+import { otherColumnsValue } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
 import {
@@ -58,11 +56,17 @@ export const Constructor = ({
   renderItem,
   scrollable,
   meta,
-}: ConstructorInterface & { meta: ConfigInterface }) => {
-  const [items, setItems] = useState<any>(
+  list,
+}: ConstructorInterface & { meta: ConfigInterface; list: Items[] }) => {
+  const groupedList = useMemo(() => {
+    return groupBy(list, meta.columnField);
+  }, [list, meta.columnField]);
+
+  const [items, setItems] = useState<{ [key: string]: Items[] }>(
     meta.columns.reduce((previousValue, currentValue) => {
       return Object.assign(previousValue, {
-        [`${currentValue.value ?? otherColumnsValue}`]: [],
+        [`${currentValue.value ?? otherColumnsValue}`]:
+          groupedList[currentValue.value ?? otherColumnsValue],
       });
     }, {}),
   );
@@ -98,7 +102,9 @@ export const Constructor = ({
       return id;
     }
 
-    return Object.keys(items).find(key => items[key].includes(id));
+    return Object.keys(items).find(key =>
+      items[key].find(el => el[meta.itemUniqKey] === id),
+    );
   };
 
   const getIndex = (id: UniqueIdentifier) => {
@@ -128,7 +134,7 @@ export const Constructor = ({
   const onDragOver = ({ active, over }: any) => {
     const overId = over?.id;
 
-    if (overId == null || overId === TRASH_ID || active.id in items) {
+    if (overId == null || active.id in items) {
       return;
     }
 
@@ -143,8 +149,12 @@ export const Constructor = ({
       setItems(items => {
         const activeItems = items[activeContainer];
         const overItems = items[overContainer];
-        const overIndex = overItems.indexOf(overId);
-        const activeIndex = activeItems.indexOf(active.id);
+        const overIndex = overItems.findIndex(
+          el => el[meta.itemUniqKey] === overId,
+        );
+        const activeIndex = activeItems.findIndex(
+          el => el[meta.itemUniqKey] === active.id,
+        );
 
         let newIndex: number;
 
@@ -168,7 +178,7 @@ export const Constructor = ({
         return {
           ...items,
           [activeContainer]: items[activeContainer].filter(
-            item => item !== active.id,
+            item => item[meta.itemUniqKey] !== active.id,
           ),
           [overContainer]: [
             ...items[overContainer].slice(0, newIndex),
@@ -207,37 +217,17 @@ export const Constructor = ({
       return;
     }
 
-    if (overId === TRASH_ID) {
-      setItems(items => ({
-        ...items,
-        [activeContainer]: items[activeContainer].filter(id => id !== activeId),
-      }));
-      setActiveId(null);
-      return;
-    }
-
-    if (overId === PLACEHOLDER_ID) {
-      const newContainerId = getNextContainerId();
-
-      unstable_batchedUpdates(() => {
-        setContainers(containers => [...containers, newContainerId]);
-        setItems(items => ({
-          ...items,
-          [activeContainer]: items[activeContainer].filter(
-            id => id !== activeId,
-          ),
-          [newContainerId]: [active.id],
-        }));
-        setActiveId(null);
-      });
-      return;
-    }
-
     const overContainer = findContainer(overId);
 
+    console.log(overContainer, activeContainer);
+
     if (overContainer) {
-      const activeIndex = items[activeContainer].indexOf(active.id);
-      const overIndex = items[overContainer].indexOf(overId);
+      const activeIndex = items[activeContainer].findIndex(
+        el => el[meta.itemUniqKey] === active.id,
+      );
+      const overIndex = items[overContainer].findIndex(
+        el => el[meta.itemUniqKey] === overId,
+      );
 
       if (activeIndex !== overIndex) {
         setItems(items => ({
@@ -268,7 +258,6 @@ export const Constructor = ({
           isDragging: true,
           isDragOverlay: true,
         })}
-        color={getColor(id)}
         wrapperStyle={wrapperStyle({ index: 0 })}
         renderItem={renderItem}
         dragOverlay
@@ -285,25 +274,26 @@ export const Constructor = ({
         }}
         shadow
       >
-        {items[containerId].map((item, index) => (
-          <Item
-            key={item}
-            value={item}
-            handle={handle}
-            style={getItemStyles({
-              containerId,
-              overIndex: -1,
-              index: getIndex(item),
-              value: item,
-              isDragging: false,
-              isSorting: false,
-              isDragOverlay: false,
-            })}
-            color={getColor(item)}
-            wrapperStyle={wrapperStyle({ index })}
-            renderItem={renderItem}
-          />
-        ))}
+        {items[containerId].map((item, index) => {
+          return (
+            <Item
+              key={item[meta.itemUniqKey]}
+              value={item[meta.itemUniqKey]}
+              handle={handle}
+              style={getItemStyles({
+                containerId,
+                overIndex: -1,
+                index: getIndex(item[meta.itemUniqKey]),
+                value: item,
+                isDragging: false,
+                isSorting: false,
+                isDragOverlay: false,
+              })}
+              wrapperStyle={wrapperStyle({ index })}
+              renderItem={renderItem}
+            />
+          );
+        })}
       </Container>
     );
   };
@@ -343,34 +333,39 @@ export const Constructor = ({
     >
       <Wrapper columns={meta.columns.length}>
         <SortableContext
-          items={[...containers, PLACEHOLDER_ID]}
+          items={containers}
           strategy={horizontalListSortingStrategy}
         >
           {containers.map(containerId => {
-            // const containerMeta =
-            //   containerId === otherColumnsValue
-            //     ? meta.columns.find(el => el.isCollectively)
-            //     : meta.columns.find(el => el.value === containerId);
+            const containerMeta =
+              containerId === otherColumnsValue
+                ? meta.columns.find(el => el.isCollectively)
+                : meta.columns.find(el => el.value === containerId);
+
+            const contextItems = items[containerId].map(el => ({
+              id: el[meta.itemUniqKey],
+            })) as any[];
+
             return (
               <DroppableContainer
                 key={containerId}
                 id={containerId}
-                label={`Column ${containerId}`}
+                label={containerMeta?.label}
                 items={items[containerId]}
                 scrollable={scrollable}
                 style={containerStyle}
                 onRemove={() => handleRemove(containerId)}
               >
                 <SortableContext
-                  items={items[containerId]}
+                  items={contextItems}
                   strategy={verticalListSortingStrategy}
                 >
                   {items[containerId].map((value, index) => {
                     return (
                       <SortableItem
+                        key={value[meta.itemUniqKey]}
+                        id={value[meta.itemUniqKey]}
                         disabled={isSortingContainer}
-                        key={value}
-                        id={value}
                         index={index}
                         handle={handle}
                         style={getItemStyles}

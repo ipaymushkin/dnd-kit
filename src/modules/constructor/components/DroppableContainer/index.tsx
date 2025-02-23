@@ -7,6 +7,7 @@ import { Container, ContainerProps } from '../Container';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import React from 'react';
 import { CSS } from '@dnd-kit/utilities';
+import { Items } from '../../../../config/types.ts';
 
 const animateLayoutChanges: AnimateLayoutChanges = args =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
@@ -21,7 +22,7 @@ const DroppableContainer = ({
 }: ContainerProps & {
   disabled?: boolean;
   id: UniqueIdentifier;
-  items: UniqueIdentifier[];
+  items: Items[];
   style?: React.CSSProperties;
 }) => {
   const {

@@ -6,7 +6,6 @@ import {
   rectIntersection,
 } from '@dnd-kit/core';
 import { useCallback } from 'react';
-import { TRASH_ID } from '../const.ts';
 
 export const useCollisionDetectionStrategy = ({
   activeId,
@@ -34,12 +33,6 @@ export const useCollisionDetectionStrategy = ({
       let overId = getFirstCollision(intersections, 'id');
 
       if (overId != null) {
-        if (overId === TRASH_ID) {
-          // If the intersecting droppable is the trash, return early
-          // Remove this if you're not using trashable functionality in your app
-          return intersections;
-        }
-
         if (overId in items) {
           const containerItems = items[overId];
 

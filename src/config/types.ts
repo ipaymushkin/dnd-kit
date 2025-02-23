@@ -20,9 +20,11 @@ export interface ConfigInterface {
   columnField: string;
   // колонки
   columns: ConfigColumnInterface[];
+  // уникальное поле для item
+  itemUniqKey: string;
 }
 
-export type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
+export type Items = Record<UniqueIdentifier, { [key: string]: any }>;
 
 export interface ConstructorInterface {
   cancelDrop?: CancelDrop;
