@@ -51,8 +51,8 @@ export interface ConstructorInterface {
     listeners: DraggableSyntheticListeners;
     ref: React.Ref<HTMLElement>;
     style: React.CSSProperties | undefined;
-    transform: string;
-    transition: string;
+    transform: any;
+    transition: any;
     value: ItemType;
   }) => React.ReactElement;
   scrollable?: boolean;
