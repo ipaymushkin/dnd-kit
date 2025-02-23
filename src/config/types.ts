@@ -1,10 +1,8 @@
 import {
-  CancelDrop,
   type DraggableSyntheticListeners,
-  Modifiers,
   UniqueIdentifier,
 } from '@dnd-kit/core';
-import React, { ReactNode } from 'react';
+import React from 'react';
 
 export interface ConfigColumnInterface {
   // название колонки
@@ -29,7 +27,6 @@ export type ItemType = { [key: string]: any };
 export type ItemsType = Record<UniqueIdentifier, ItemType>;
 
 export interface ConstructorInterface {
-  cancelDrop?: CancelDrop;
   getContainerStyle?: (args: {
     container: ConfigColumnInterface;
     index: number;
@@ -45,7 +42,18 @@ export interface ConstructorInterface {
   }) => React.CSSProperties;
   wrapperStyle?: (args: { index: number }) => React.CSSProperties;
   handle?: boolean;
-  renderItem?: any;
-  modifiers?: Modifiers;
+  renderItem?: (args: {
+    dragOverlay: boolean;
+    dragging: boolean;
+    sorting: boolean;
+    index: number | undefined;
+    fadeIn: boolean;
+    listeners: DraggableSyntheticListeners;
+    ref: React.Ref<HTMLElement>;
+    style: React.CSSProperties | undefined;
+    transform: string;
+    transition: string;
+    value: ItemType;
+  }) => React.ReactElement;
   scrollable?: boolean;
 }

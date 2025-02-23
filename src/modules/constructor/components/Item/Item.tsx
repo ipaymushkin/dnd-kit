@@ -1,13 +1,18 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import classNames from 'classnames';
-import type {DraggableSyntheticListeners} from '@dnd-kit/core';
-import type {Transform} from '@dnd-kit/utilities';
+import type { DraggableSyntheticListeners } from '@dnd-kit/core';
+import type { Transform } from '@dnd-kit/utilities';
 
-import {Handle, Remove} from './components';
+import { Handle, Remove } from './components';
 
 import styles from './Item.module.css';
+import {
+  ConfigColumnInterface,
+  ConstructorInterface,
+  ItemType,
+} from '../../../../config/types.ts';
 
-export interface Props {
+type Props = {
   dragOverlay?: boolean;
   color?: string;
   disabled?: boolean;
@@ -23,22 +28,11 @@ export interface Props {
   style?: React.CSSProperties;
   transition?: string | null;
   wrapperStyle?: React.CSSProperties;
-  value: React.ReactNode;
-  onRemove?(): void;
-  renderItem?(args: {
-    dragOverlay: boolean;
-    dragging: boolean;
-    sorting: boolean;
-    index: number | undefined;
-    fadeIn: boolean;
-    listeners: DraggableSyntheticListeners;
-    ref: React.Ref<HTMLElement>;
-    style: React.CSSProperties | undefined;
-    transform: Props['transform'];
-    transition: Props['transition'];
-    value: Props['value'];
-  }): React.ReactElement;
-}
+  value: ItemType;
+  onRemove?: () => void;
+  renderItem: ConstructorInterface['renderItem'];
+  container: ConfigColumnInterface;
+};
 
 export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
@@ -51,7 +45,7 @@ export const Item = React.memo(
         fadeIn,
         handle,
         handleProps,
-        height,
+        // height,
         index,
         listeners,
         onRemove,
@@ -64,7 +58,7 @@ export const Item = React.memo(
         wrapperStyle,
         ...props
       },
-      ref
+      ref,
     ) => {
       useEffect(() => {
         if (!dragOverlay) {
@@ -98,7 +92,7 @@ export const Item = React.memo(
             styles.Wrapper,
             fadeIn && styles.fadeIn,
             sorting && styles.sorting,
-            dragOverlay && styles.dragOverlay
+            dragOverlay && styles.dragOverlay,
           )}
           style={
             {
@@ -131,7 +125,7 @@ export const Item = React.memo(
               handle && styles.withHandle,
               dragOverlay && styles.dragOverlay,
               disabled && styles.disabled,
-              color && styles.color
+              color && styles.color,
             )}
             style={style}
             data-cypress="draggable-item"
@@ -139,7 +133,7 @@ export const Item = React.memo(
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
-            {value}
+            {value.id}
             <span className={styles.Actions}>
               {onRemove ? (
                 <Remove className={styles.Remove} onClick={onRemove} />
@@ -149,6 +143,6 @@ export const Item = React.memo(
           </div>
         </li>
       );
-    }
-  )
+    },
+  ),
 );

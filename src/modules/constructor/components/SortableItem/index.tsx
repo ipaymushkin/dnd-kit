@@ -15,7 +15,6 @@ interface SortableItemProps {
   handle: boolean;
   disabled?: boolean;
   getIndex(id: UniqueIdentifier): number;
-  renderItem(): React.ReactElement;
   wrapperStyle({ index }: { index: number }): React.CSSProperties;
   item: ItemType;
   containerMeta: ConfigColumnInterface;
@@ -33,6 +32,7 @@ const SortableItem = ({
   getItemStyles,
 }: SortableItemProps & {
   getItemStyles: ConstructorInterface['getItemStyles'];
+  renderItem: ConstructorInterface['renderItem'];
 }) => {
   const {
     setNodeRef,
@@ -50,19 +50,11 @@ const SortableItem = ({
   const mounted = useMountStatus();
   const mountedWhileDragging = isDragging && !mounted;
 
-  /*
-  container: getContainerMetaByContainerId(findContainer(item.id)),
-          overIndex: -1,
-          index: getIndex(item.id),
-          item: getItemByItemId(item.id),
-          isSorting: true,
-          isDragging: true,
-          isDragOverlay: true,
-   */
   return (
     <Item
       ref={disabled ? undefined : setNodeRef}
-      value={id}
+      value={item}
+      container={containerMeta}
       dragging={isDragging}
       sorting={isSorting}
       handle={handle}

@@ -49,11 +49,9 @@ const dropAnimation: DropAnimation = {
 };
 
 export const Constructor = ({
-  cancelDrop,
   handle = false,
   getContainerStyle = () => ({}),
   getItemStyles = () => ({}),
-  modifiers,
   renderItem,
   scrollable,
   meta,
@@ -257,12 +255,14 @@ export const Constructor = ({
   };
 
   const renderSortableItemDragOverlay = (item: ItemType) => {
+    const containerMeta = getContainerMetaByContainerId(findContainer(item.id));
     return (
       <Item
-        value={item.id}
+        value={item}
+        containerMeta={containerMeta}
         handle={handle}
         style={getItemStyles({
-          container: getContainerMetaByContainerId(findContainer(item.id)),
+          container: containerMeta,
           overIndex: -1,
           index: getIndex(item.id),
           item: getItemByItemId(item.id),
@@ -287,11 +287,12 @@ export const Constructor = ({
         }}
         shadow
       >
-        {items[container.id].map((item, index) => {
+        {items[container.id].map(item => {
           return (
             <Item
               key={item[meta.itemUniqKey]}
-              value={item[meta.itemUniqKey]}
+              value={item}
+              container={containerMeta}
               handle={handle}
               style={getItemStyles({
                 container: containerMeta,
@@ -332,9 +333,7 @@ export const Constructor = ({
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDragEnd={onDragEnd}
-      cancelDrop={cancelDrop}
       onDragCancel={onDragCancel}
-      modifiers={modifiers}
     >
       <Wrapper columns={meta.columns.length}>
         <SortableContext
