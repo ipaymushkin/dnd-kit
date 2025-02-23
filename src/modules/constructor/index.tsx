@@ -272,6 +272,7 @@ export const Constructor = ({
         })}
         renderItem={renderItem}
         dragOverlay
+        itemCardLabelKey={meta.itemCardLabelKey}
       />
     );
   };
@@ -282,10 +283,11 @@ export const Constructor = ({
     return (
       <Container
         label={containerMeta?.label}
-        style={{
-          height: '100%',
-        }}
         shadow
+        style={getContainerStyle({
+          container: containerMeta,
+          isOverlay: true,
+        })}
       >
         {items[container.id].map(item => {
           return (
@@ -304,6 +306,7 @@ export const Constructor = ({
                 isDragOverlay: false,
               })}
               renderItem={renderItem}
+              itemCardLabelKey={meta.itemCardLabelKey}
             />
           );
         })}
@@ -361,6 +364,7 @@ export const Constructor = ({
                 style={getContainerStyle({
                   container: containerMeta,
                   index: idx,
+                  isOverlay: false,
                 })}
                 onRemove={() => handleRemove(containerId)}
               >
@@ -381,6 +385,7 @@ export const Constructor = ({
                         getIndex={getIndex}
                         item={value}
                         containerMeta={containerMeta}
+                        itemCardLabelKey={meta.itemCardLabelKey}
                       />
                     );
                   })}

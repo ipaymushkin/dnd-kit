@@ -1,10 +1,10 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
-import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { useMountStatus } from '../../hooks/useMountStatus.ts';
 import { Item } from '../Item';
 import {
   ConfigColumnInterface,
+  ConfigInterface,
   ConstructorInterface,
   ItemType,
 } from '../../../../config/types.ts';
@@ -15,7 +15,6 @@ interface SortableItemProps {
   handle: boolean;
   disabled?: boolean;
   getIndex(id: UniqueIdentifier): number;
-  wrapperStyle({ index }: { index: number }): React.CSSProperties;
   item: ItemType;
   containerMeta: ConfigColumnInterface;
 }
@@ -30,9 +29,11 @@ const SortableItem = ({
   item,
   containerMeta,
   getItemStyles,
+  itemCardLabelKey,
 }: SortableItemProps & {
   getItemStyles: ConstructorInterface['getItemStyles'];
   renderItem: ConstructorInterface['renderItem'];
+  itemCardLabelKey?: ConfigInterface['itemCardLabelKey'];
 }) => {
   const {
     setNodeRef,
@@ -77,6 +78,7 @@ const SortableItem = ({
       fadeIn={mountedWhileDragging}
       listeners={listeners}
       renderItem={renderItem}
+      itemCardLabelKey={itemCardLabelKey}
     />
   );
 };

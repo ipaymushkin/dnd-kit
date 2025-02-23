@@ -20,6 +20,8 @@ export interface ConfigInterface {
   columns: ConfigColumnInterface[];
   // уникальное поле для item
   itemUniqKey: string;
+  // название поля для вывода в карточке
+  itemCardLabelKey?: string;
 }
 
 export type ItemType = { [key: string]: any };
@@ -29,7 +31,8 @@ export type ItemsType = Record<UniqueIdentifier, ItemType>;
 export interface ConstructorInterface {
   getContainerStyle?: (args: {
     container: ConfigColumnInterface;
-    index: number;
+    index?: number;
+    isOverlay: boolean;
   }) => React.CSSProperties;
   getItemStyles?: (args: {
     item: ItemType;
@@ -54,6 +57,7 @@ export interface ConstructorInterface {
     transform: any;
     transition: any;
     value: ItemType;
+    disabled: boolean;
   }) => React.ReactElement;
   scrollable?: boolean;
 }
