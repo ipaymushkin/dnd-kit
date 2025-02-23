@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal, unstable_batchedUpdates } from 'react-dom';
+import { createPortal } from 'react-dom';
 import {
   defaultDropAnimationSideEffects,
   DndContext,
@@ -30,9 +30,11 @@ import { otherColumnsValue } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
 import {
+  ConfigColumnInterface,
   ConfigInterface,
   ConstructorInterface,
-  Items,
+  ItemsType,
+  ItemType,
 } from '../../config/types.ts';
 import styled from 'styled-components';
 
@@ -49,7 +51,7 @@ const dropAnimation: DropAnimation = {
 export const Constructor = ({
   cancelDrop,
   handle = false,
-  containerStyle,
+  getContainerStyle = () => ({}),
   getItemStyles = () => ({}),
   wrapperStyle = () => ({}),
   modifiers,
@@ -57,12 +59,12 @@ export const Constructor = ({
   scrollable,
   meta,
   list,
-}: ConstructorInterface & { meta: ConfigInterface; list: Items[] }) => {
+}: ConstructorInterface & { meta: ConfigInterface; list: ItemsType[] }) => {
   const groupedList = useMemo(() => {
     return groupBy(list, meta.columnField);
   }, [list, meta.columnField]);
 
-  const [items, setItems] = useState<{ [key: string]: Items[] }>(
+  const [items, setItems] = useState<{ [key: string]: ItemsType[] }>(
     meta.columns.reduce((previousValue, currentValue) => {
       return Object.assign(previousValue, {
         [`${currentValue.value ?? otherColumnsValue}`]:
@@ -74,20 +76,22 @@ export const Constructor = ({
   const [containers, setContainers] = useState(
     Object.keys(items) as UniqueIdentifier[],
   );
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  const [activeEl, setActiveEl] = useState<any>();
+  // todo
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
-  const isSortingContainer =
-    activeId != null ? containers.includes(activeId) : false;
+  const isSortingContainer = activeEl
+    ? containers.includes(activeEl.id)
+    : false;
 
   const { collisionDetectionStrategy } = useCollisionDetectionStrategy({
-    activeId,
+    activeId: activeEl?.id || null,
     lastOverId,
     recentlyMovedToNewContainer,
     items,
   });
 
-  const [clonedItems, setClonedItems] = useState<Items | null>(null);
+  const [clonedItems, setClonedItems] = useState<ItemsType | null>(null);
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -96,6 +100,18 @@ export const Constructor = ({
       coordinateGetter: multipleContainersCoordinateGetter,
     }),
   );
+
+  const getContainerMetaByContainerId = (containerId: UniqueIdentifier) => {
+    return containerId === otherColumnsValue
+      ? meta.columns.find(el => el.isCollectively)
+      : (meta.columns.find(
+          el => el.value === containerId,
+        ) as ConfigColumnInterface);
+  };
+
+  const getItemByItemId = (itemId: UniqueIdentifier) => {
+    return list.find(el => el[meta.itemUniqKey] === itemId) as ItemType;
+  };
 
   const findContainer = (id: UniqueIdentifier) => {
     if (id in items) {
@@ -122,12 +138,12 @@ export const Constructor = ({
       setItems(clonedItems);
     }
 
-    setActiveId(null);
+    setActiveEl(null);
     setClonedItems(null);
   };
 
   const onDragStart = ({ active }: any) => {
-    setActiveId(active.id);
+    setActiveEl(active);
     setClonedItems(items);
   };
 
@@ -206,20 +222,18 @@ export const Constructor = ({
     const activeContainer = findContainer(active.id);
 
     if (!activeContainer) {
-      setActiveId(null);
+      setActiveEl(null);
       return;
     }
 
     const overId = over?.id;
 
     if (overId == null) {
-      setActiveId(null);
+      setActiveEl(null);
       return;
     }
 
     const overContainer = findContainer(overId);
-
-    console.log(overContainer, activeContainer);
 
     if (overContainer) {
       const activeIndex = items[activeContainer].findIndex(
@@ -241,19 +255,19 @@ export const Constructor = ({
       }
     }
 
-    setActiveId(null);
+    setActiveEl(null);
   };
 
-  const renderSortableItemDragOverlay = (id: UniqueIdentifier) => {
+  const renderSortableItemDragOverlay = (item: ItemType) => {
     return (
       <Item
-        value={id}
+        value={item.id}
         handle={handle}
         style={getItemStyles({
-          containerId: findContainer(id) as UniqueIdentifier,
+          container: getContainerMetaByContainerId(findContainer(item.id)),
           overIndex: -1,
-          index: getIndex(id),
-          value: id,
+          index: getIndex(item.id),
+          item: getItemByItemId(item.id),
           isSorting: true,
           isDragging: true,
           isDragOverlay: true,
@@ -265,26 +279,28 @@ export const Constructor = ({
     );
   };
 
-  const renderContainerDragOverlay = (containerId: UniqueIdentifier) => {
+  const renderContainerDragOverlay = (container: any) => {
+    const containerMeta = getContainerMetaByContainerId(container.id);
+    if (!containerMeta) return null;
     return (
       <Container
-        label={`Column ${containerId}`}
+        label={containerMeta?.label}
         style={{
           height: '100%',
         }}
         shadow
       >
-        {items[containerId].map((item, index) => {
+        {items[container.id].map((item, index) => {
           return (
             <Item
               key={item[meta.itemUniqKey]}
               value={item[meta.itemUniqKey]}
               handle={handle}
               style={getItemStyles({
-                containerId,
+                container: containerMeta,
                 overIndex: -1,
                 index: getIndex(item[meta.itemUniqKey]),
-                value: item,
+                item,
                 isDragging: false,
                 isSorting: false,
                 isDragOverlay: false,
@@ -300,13 +316,6 @@ export const Constructor = ({
 
   const handleRemove = (containerID: UniqueIdentifier) => {
     setContainers(containers => containers.filter(id => id !== containerID));
-  };
-
-  const getNextContainerId = () => {
-    const containerIds = Object.keys(items);
-    const lastContainerId = containerIds[containerIds.length - 1];
-
-    return String.fromCharCode(lastContainerId.charCodeAt(0) + 1);
   };
 
   useEffect(() => {
@@ -336,11 +345,12 @@ export const Constructor = ({
           items={containers}
           strategy={horizontalListSortingStrategy}
         >
-          {containers.map(containerId => {
-            const containerMeta =
-              containerId === otherColumnsValue
-                ? meta.columns.find(el => el.isCollectively)
-                : meta.columns.find(el => el.value === containerId);
+          {containers.map((containerId, idx: number) => {
+            const containerMeta = getContainerMetaByContainerId(containerId);
+
+            if (!containerMeta) {
+              return <div>Проблема с колонкой {containerId}</div>;
+            }
 
             const contextItems = items[containerId].map(el => ({
               id: el[meta.itemUniqKey],
@@ -350,10 +360,13 @@ export const Constructor = ({
               <DroppableContainer
                 key={containerId}
                 id={containerId}
-                label={containerMeta?.label}
+                label={containerMeta.label}
                 items={items[containerId]}
                 scrollable={scrollable}
-                style={containerStyle}
+                style={getContainerStyle({
+                  container: containerMeta,
+                  index: idx,
+                })}
                 onRemove={() => handleRemove(containerId)}
               >
                 <SortableContext
@@ -368,11 +381,12 @@ export const Constructor = ({
                         disabled={isSortingContainer}
                         index={index}
                         handle={handle}
-                        style={getItemStyles}
+                        getItemStyles={getItemStyles}
                         wrapperStyle={wrapperStyle}
                         renderItem={renderItem}
-                        containerId={containerId}
                         getIndex={getIndex}
+                        item={value}
+                        containerMeta={containerMeta}
                       />
                     );
                   })}
@@ -384,10 +398,10 @@ export const Constructor = ({
       </Wrapper>
       {createPortal(
         <DragOverlay dropAnimation={dropAnimation}>
-          {activeId
-            ? containers.includes(activeId)
-              ? renderContainerDragOverlay(activeId)
-              : renderSortableItemDragOverlay(activeId)
+          {activeEl
+            ? containers.includes(activeEl.id)
+              ? renderContainerDragOverlay(activeEl)
+              : renderSortableItemDragOverlay(activeEl)
             : null}
         </DragOverlay>,
         document.body,

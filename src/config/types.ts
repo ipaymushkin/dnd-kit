@@ -24,17 +24,22 @@ export interface ConfigInterface {
   itemUniqKey: string;
 }
 
-export type Items = Record<UniqueIdentifier, { [key: string]: any }>;
+export type ItemType = { [key: string]: any };
+
+export type ItemsType = Record<UniqueIdentifier, ItemType>;
 
 export interface ConstructorInterface {
   cancelDrop?: CancelDrop;
-  containerStyle?: React.CSSProperties;
+  getContainerStyle?: (args: {
+    container: ConfigColumnInterface;
+    index: number;
+  }) => React.CSSProperties;
   getItemStyles?: (args: {
-    value: UniqueIdentifier;
+    item: ItemType;
     index: number;
     overIndex: number;
     isDragging: boolean;
-    containerId: UniqueIdentifier;
+    container: ConfigColumnInterface;
     isSorting: boolean;
     isDragOverlay: boolean;
   }) => React.CSSProperties;

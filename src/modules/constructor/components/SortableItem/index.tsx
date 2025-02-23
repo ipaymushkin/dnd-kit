@@ -3,17 +3,22 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { useMountStatus } from '../../hooks/useMountStatus.ts';
 import { Item } from '../Item';
+import {
+  ConfigColumnInterface,
+  ConstructorInterface,
+  ItemType,
+} from '../../../../config/types.ts';
 
 interface SortableItemProps {
-  containerId: UniqueIdentifier;
   id: UniqueIdentifier;
   index: number;
   handle: boolean;
   disabled?: boolean;
-  style(args: any): React.CSSProperties;
   getIndex(id: UniqueIdentifier): number;
   renderItem(): React.ReactElement;
   wrapperStyle({ index }: { index: number }): React.CSSProperties;
+  item: ItemType;
+  containerMeta: ConfigColumnInterface;
 }
 
 const SortableItem = ({
@@ -22,11 +27,14 @@ const SortableItem = ({
   index,
   handle,
   renderItem,
-  style,
-  containerId,
   getIndex,
   wrapperStyle,
-}: SortableItemProps) => {
+  item,
+  containerMeta,
+  getItemStyles,
+}: SortableItemProps & {
+  getItemStyles: ConstructorInterface['getItemStyles'];
+}) => {
   const {
     setNodeRef,
     setActivatorNodeRef,
@@ -43,6 +51,15 @@ const SortableItem = ({
   const mounted = useMountStatus();
   const mountedWhileDragging = isDragging && !mounted;
 
+  /*
+  container: getContainerMetaByContainerId(findContainer(item.id)),
+          overIndex: -1,
+          index: getIndex(item.id),
+          item: getItemByItemId(item.id),
+          isSorting: true,
+          isDragging: true,
+          isDragOverlay: true,
+   */
   return (
     <Item
       ref={disabled ? undefined : setNodeRef}
@@ -53,14 +70,18 @@ const SortableItem = ({
       handleProps={handle ? { ref: setActivatorNodeRef } : undefined}
       index={index}
       wrapperStyle={wrapperStyle({ index })}
-      style={style({
-        index,
-        value: id,
-        isDragging,
-        isSorting,
-        overIndex: over ? getIndex(over.id) : overIndex,
-        containerId,
-      })}
+      style={
+        getItemStyles &&
+        getItemStyles({
+          index,
+          item,
+          isDragging,
+          isSorting,
+          overIndex: over ? getIndex(over.id) : overIndex,
+          container: containerMeta,
+          isDragOverlay: false,
+        })
+      }
       transition={transition}
       transform={transform}
       fadeIn={mountedWhileDragging}
