@@ -28,7 +28,6 @@ const SortableItem = ({
   handle,
   renderItem,
   getIndex,
-  wrapperStyle,
   item,
   containerMeta,
   getItemStyles,
@@ -69,7 +68,6 @@ const SortableItem = ({
       handle={handle}
       handleProps={handle ? { ref: setActivatorNodeRef } : undefined}
       index={index}
-      wrapperStyle={wrapperStyle({ index })}
       style={
         getItemStyles &&
         getItemStyles({

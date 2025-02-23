@@ -53,7 +53,6 @@ export const Constructor = ({
   handle = false,
   getContainerStyle = () => ({}),
   getItemStyles = () => ({}),
-  wrapperStyle = () => ({}),
   modifiers,
   renderItem,
   scrollable,
@@ -77,7 +76,6 @@ export const Constructor = ({
     Object.keys(items) as UniqueIdentifier[],
   );
   const [activeEl, setActiveEl] = useState<any>();
-  // todo
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
   const isSortingContainer = activeEl
@@ -272,7 +270,6 @@ export const Constructor = ({
           isDragging: true,
           isDragOverlay: true,
         })}
-        wrapperStyle={wrapperStyle({ index: 0 })}
         renderItem={renderItem}
         dragOverlay
       />
@@ -305,7 +302,6 @@ export const Constructor = ({
                 isSorting: false,
                 isDragOverlay: false,
               })}
-              wrapperStyle={wrapperStyle({ index })}
               renderItem={renderItem}
             />
           );
@@ -382,7 +378,6 @@ export const Constructor = ({
                         index={index}
                         handle={handle}
                         getItemStyles={getItemStyles}
-                        wrapperStyle={wrapperStyle}
                         renderItem={renderItem}
                         getIndex={getIndex}
                         item={value}
