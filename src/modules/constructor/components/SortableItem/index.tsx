@@ -12,7 +12,6 @@ import {
 interface SortableItemProps {
   id: UniqueIdentifier;
   index: number;
-  handle: boolean;
   disabled?: boolean;
   getIndex(id: UniqueIdentifier): number;
   item: ItemType;
@@ -23,7 +22,7 @@ const SortableItem = ({
   disabled,
   id,
   index,
-  handle,
+  customItemHandle,
   renderItem,
   getIndex,
   item,
@@ -34,6 +33,7 @@ const SortableItem = ({
   getItemStyles: ConstructorInterface['getItemStyles'];
   renderItem: ConstructorInterface['renderItem'];
   itemCardLabelKey?: ConfigInterface['itemCardLabelKey'];
+  customItemHandle?: ConstructorInterface['customItemHandle'];
 }) => {
   const {
     setNodeRef,
@@ -58,8 +58,8 @@ const SortableItem = ({
       container={containerMeta}
       dragging={isDragging}
       sorting={isSorting}
-      handle={handle}
-      handleProps={handle ? { ref: setActivatorNodeRef } : undefined}
+      customItemHandle={customItemHandle}
+      handleProps={customItemHandle ? { ref: setActivatorNodeRef } : undefined}
       index={index}
       style={
         getItemStyles &&

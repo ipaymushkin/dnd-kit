@@ -44,7 +44,7 @@ export interface ConstructorInterface {
     isDragOverlay: boolean;
   }) => React.CSSProperties;
   wrapperStyle?: (args: { index: number }) => React.CSSProperties;
-  handle?: boolean;
+  customItemHandle?: boolean;
   renderItem?: (args: {
     dragOverlay: boolean;
     dragging: boolean;
@@ -58,6 +58,7 @@ export interface ConstructorInterface {
     transition: any;
     value: ItemType;
     disabled: boolean;
+    handleProps: any;
   }) => React.ReactElement;
   scrollable?: boolean;
 }

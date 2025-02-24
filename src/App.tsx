@@ -9,6 +9,7 @@ const App = () => {
     <Constructor
       meta={meta}
       list={items}
+      // customItemHandle={true}
       renderItem={({
         value,
         transition,
@@ -22,8 +23,16 @@ const App = () => {
         dragOverlay,
         dragging,
         disabled,
+        handleProps,
       }) => {
-        return <div>{value.id}</div>;
+        return (
+          <div>
+            <div>{value.id}</div>
+            {/*<div {...listeners} {...handleProps}>*/}
+            {/*  drag*/}
+            {/*</div>*/}
+          </div>
+        );
       }}
     />
   );

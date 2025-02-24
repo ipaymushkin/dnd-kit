@@ -49,7 +49,7 @@ const dropAnimation: DropAnimation = {
 };
 
 export const Constructor = ({
-  handle = false,
+  customItemHandle = false,
   getContainerStyle = () => ({}),
   getItemStyles = () => ({}),
   renderItem,
@@ -260,7 +260,7 @@ export const Constructor = ({
       <Item
         value={item}
         containerMeta={containerMeta}
-        handle={handle}
+        customItemHandle={customItemHandle}
         style={getItemStyles({
           container: containerMeta,
           overIndex: -1,
@@ -295,7 +295,7 @@ export const Constructor = ({
               key={item[meta.itemUniqKey]}
               value={item}
               container={containerMeta}
-              handle={handle}
+              customItemHandle={customItemHandle}
               style={getItemStyles({
                 container: containerMeta,
                 overIndex: -1,
@@ -379,7 +379,7 @@ export const Constructor = ({
                         id={value[meta.itemUniqKey]}
                         disabled={isSortingContainer}
                         index={index}
-                        handle={handle}
+                        customItemHandle={customItemHandle}
                         getItemStyles={getItemStyles}
                         renderItem={renderItem}
                         getIndex={getIndex}

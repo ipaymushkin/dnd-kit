@@ -14,10 +14,8 @@ import styled from 'styled-components';
 
 type Props = {
   dragOverlay?: boolean;
-  color?: string;
   disabled?: boolean;
   dragging?: boolean;
-  handle?: boolean;
   handleProps?: any;
   height?: number;
   index?: number;
@@ -29,28 +27,26 @@ type Props = {
   transition?: string | null;
   wrapperStyle?: React.CSSProperties;
   value: ItemType;
-  onRemove?: () => void;
   renderItem: ConstructorInterface['renderItem'];
   container: ConfigColumnInterface;
 } & {
   itemCardLabelKey?: ConfigInterface['itemCardLabelKey'];
+  customItemHandle?: ConstructorInterface['customItemHandle'];
 };
 
 export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
-        color,
         dragOverlay,
         dragging,
         disabled = false,
         fadeIn,
-        handle,
+        customItemHandle,
         handleProps,
         // height,
         index,
         listeners,
-        onRemove,
         renderItem,
         sorting,
         style,
@@ -82,9 +78,9 @@ export const Item = React.memo(
           sY={transform?.scaleY ? `${transform.scaleY}` : undefined}
           ref={ref}
           data-cypress="draggable-item"
-          {...(!handle ? listeners : undefined)}
+          {...(!customItemHandle ? listeners : undefined)}
           {...props}
-          tabIndex={!handle ? 0 : undefined}
+          tabIndex={!customItemHandle ? 0 : undefined}
         >
           {renderItem
             ? renderItem({
@@ -100,20 +96,9 @@ export const Item = React.memo(
                 transition,
                 value,
                 disabled,
+                handleProps,
               })
             : value[itemCardLabelKey]}
-          <div>
-            {onRemove ? (
-              <div onClick={onRemove}>
-                <Remove />
-              </div>
-            ) : null}
-            {handle ? (
-              <div {...handleProps} {...listeners}>
-                <Handle />
-              </div>
-            ) : null}
-          </div>
         </ItemWrapper>
       );
     },
