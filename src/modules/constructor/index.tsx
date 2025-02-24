@@ -56,6 +56,9 @@ export const Constructor = ({
   renderContainer,
   meta,
   list,
+  onRemoveContainer,
+  hideColumnSorting,
+  hideColumnRemove,
 }: ConstructorInterface & { meta: ConfigInterface; list: ItemsType[] }) => {
   const groupedList = useMemo(() => {
     return groupBy(list, meta.columnField);
@@ -369,6 +372,9 @@ export const Constructor = ({
                   isOverlay: false,
                 })}
                 onRemove={() => handleRemove(containerId)}
+                onRemoveContainer={onRemoveContainer}
+                hideColumnSorting={hideColumnSorting}
+                hideColumnRemove={hideColumnRemove}
               >
                 <SortableContext
                   items={contextItems}

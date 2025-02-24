@@ -16,6 +16,9 @@ export type Props = {
 } & {
   renderContainer?: ConstructorInterface['renderContainer'];
   containerMeta: ConfigColumnInterface;
+  onRemoveContainer: ConstructorInterface['onRemoveContainer'];
+  hideColumnSorting: ConstructorInterface['hideColumnSorting'];
+  hideColumnRemove: ConstructorInterface['hideColumnRemove'];
 };
 
 export const Container = forwardRef<HTMLDivElement, Props>(
@@ -29,6 +32,9 @@ export const Container = forwardRef<HTMLDivElement, Props>(
       style,
       renderContainer,
       containerMeta,
+      onRemoveContainer,
+      hideColumnSorting,
+      hideColumnRemove,
       ...props
     }: Props,
     ref,
@@ -50,12 +56,21 @@ export const Container = forwardRef<HTMLDivElement, Props>(
             <div>
               {label}
               <div>
-                <div onClick={onRemove}>
-                  <Remove />
-                </div>
-                <div {...handleProps}>
-                  <Handle />
-                </div>
+                {!hideColumnRemove && (
+                  <div
+                    onClick={() => {
+                      onRemoveContainer?.(containerMeta);
+                      onRemove?.();
+                    }}
+                  >
+                    <Remove />
+                  </div>
+                )}
+                {!hideColumnSorting && (
+                  <div {...handleProps}>
+                    <Handle />
+                  </div>
+                )}
               </div>
             </div>
             <div style={{ minHeight: '400px' }}>{children}</div>

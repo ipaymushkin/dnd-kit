@@ -10,38 +10,41 @@ const App = () => {
       meta={meta}
       list={items}
       // customItemHandle={true}
-      renderItem={({
-        value,
-        transition,
-        transform,
-        ref,
-        index,
-        listeners,
-        style,
-        fadeIn,
-        sorting,
-        dragOverlay,
-        dragging,
-        disabled,
-        handleProps,
-      }) => {
-        return (
-          <div>
-            <div>{value.id}</div>
-            {/*<div {...listeners} {...handleProps}>*/}
-            {/*  drag*/}
-            {/*</div>*/}
-          </div>
-        );
-      }}
-      renderContainer={({ containerMeta, handleProps, onRemove, children }) => {
-        return (
-          <div>
-            <div>{containerMeta.label}</div>
-            {/*<div {...handleProps}>drag</div>*/}
-            <div>{children}</div>
-          </div>
-        );
+      // renderItem={({
+      //   value,
+      //   transition,
+      //   transform,
+      //   ref,
+      //   index,
+      //   listeners,
+      //   style,
+      //   fadeIn,
+      //   sorting,
+      //   dragOverlay,
+      //   dragging,
+      //   disabled,
+      //   handleProps,
+      // }) => {
+      //   return (
+      //     <div>
+      //       <div>{value.id}</div>
+      //       {/*<div {...listeners} {...handleProps}>*/}
+      //       {/*  drag*/}
+      //       {/*</div>*/}
+      //     </div>
+      //   );
+      // }}
+      // renderContainer={({ containerMeta, handleProps, onRemove, children }) => {
+      //   return (
+      //     <div>
+      //       <div>{containerMeta.label}</div>
+      //       {/*<div {...handleProps}>drag</div>*/}
+      //       <div>{children}</div>
+      //     </div>
+      //   );
+      // }}
+      onRemoveContainer={container => {
+        console.log(container);
       }}
     />
   );

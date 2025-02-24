@@ -66,4 +66,7 @@ export interface ConstructorInterface {
     onRemove: VoidFunction;
     children: any;
   }) => React.ReactElement;
+  onRemoveContainer?: (container: ConfigColumnInterface) => void;
+  hideColumnSorting?: boolean;
+  hideColumnRemove?: boolean;
 }
