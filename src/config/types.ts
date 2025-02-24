@@ -60,5 +60,4 @@ export interface ConstructorInterface {
     disabled: boolean;
     handleProps: any;
   }) => React.ReactElement;
-  scrollable?: boolean;
 }

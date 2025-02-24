@@ -53,7 +53,6 @@ export const Constructor = ({
   getContainerStyle = () => ({}),
   getItemStyles = () => ({}),
   renderItem,
-  scrollable,
   meta,
   list,
 }: ConstructorInterface & { meta: ConfigInterface; list: ItemsType[] }) => {
@@ -360,7 +359,6 @@ export const Constructor = ({
                 id={containerId}
                 label={containerMeta.label}
                 items={items[containerId]}
-                scrollable={scrollable}
                 style={getContainerStyle({
                   container: containerMeta,
                   index: idx,

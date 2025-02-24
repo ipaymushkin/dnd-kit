@@ -7,7 +7,6 @@ export interface Props {
   label?: string;
   style?: React.CSSProperties;
   handleProps?: React.HTMLAttributes<any>;
-  scrollable?: boolean;
   shadow?: boolean;
   placeholder?: boolean;
   onClick?: () => void;
