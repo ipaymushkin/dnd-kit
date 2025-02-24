@@ -1,17 +1,22 @@
 import React, { forwardRef } from 'react';
 import { Remove } from '../../icons/Remove.tsx';
 import Handle from '../../icons/Handle.tsx';
+import {
+  ConfigColumnInterface,
+  ConstructorInterface,
+} from '../../../../config/types.ts';
 
-export interface Props {
+export type Props = {
   children: React.ReactNode;
   label?: string;
   style?: React.CSSProperties;
   handleProps?: React.HTMLAttributes<any>;
-  shadow?: boolean;
-  placeholder?: boolean;
   onClick?: () => void;
   onRemove?: () => void;
-}
+} & {
+  renderContainer?: ConstructorInterface['renderContainer'];
+  containerMeta: ConfigColumnInterface;
+};
 
 export const Container = forwardRef<HTMLDivElement, Props>(
   (
@@ -21,8 +26,9 @@ export const Container = forwardRef<HTMLDivElement, Props>(
       onClick,
       onRemove,
       label,
-      placeholder,
       style,
+      renderContainer,
+      containerMeta,
       ...props
     }: Props,
     ref,
@@ -37,7 +43,9 @@ export const Container = forwardRef<HTMLDivElement, Props>(
         onClick={onClick}
         tabIndex={onClick ? 0 : undefined}
       >
-        {label ? (
+        {renderContainer ? (
+          renderContainer({ containerMeta, handleProps, onRemove })
+        ) : (
           <div>
             {label}
             <div>
@@ -49,8 +57,8 @@ export const Container = forwardRef<HTMLDivElement, Props>(
               </div>
             </div>
           </div>
-        ) : null}
-        {placeholder ? children : <div>{children}</div>}
+        )}
+        <div>{children}</div>
       </Component>
     );
   },

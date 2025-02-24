@@ -60,4 +60,9 @@ export interface ConstructorInterface {
     disabled: boolean;
     handleProps: any;
   }) => React.ReactElement;
+  renderContainer?: (args: {
+    containerMeta: ConfigColumnInterface;
+    handleProps: any;
+    onRemove: VoidFunction;
+  }) => React.ReactElement;
 }

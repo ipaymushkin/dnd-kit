@@ -53,6 +53,7 @@ export const Constructor = ({
   getContainerStyle = () => ({}),
   getItemStyles = () => ({}),
   renderItem,
+  renderContainer,
   meta,
   list,
 }: ConstructorInterface & { meta: ConfigInterface; list: ItemsType[] }) => {
@@ -282,11 +283,12 @@ export const Constructor = ({
     return (
       <Container
         label={containerMeta?.label}
-        shadow
+        renderContainer={renderContainer}
         style={getContainerStyle({
           container: containerMeta,
           isOverlay: true,
         })}
+        containerMeta={containerMeta}
       >
         {items[container.id].map(item => {
           return (
@@ -355,9 +357,11 @@ export const Constructor = ({
 
             return (
               <DroppableContainer
+                containerMeta={containerMeta}
                 key={containerId}
                 id={containerId}
                 label={containerMeta.label}
+                renderContainer={renderContainer}
                 items={items[containerId]}
                 style={getContainerStyle({
                   container: containerMeta,

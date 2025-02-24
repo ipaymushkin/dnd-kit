@@ -34,6 +34,13 @@ const App = () => {
           </div>
         );
       }}
+      renderContainer={({ containerMeta, handleProps, onRemove }) => {
+        return (
+          <div>
+            <div>{containerMeta.label}</div>
+          </div>
+        );
+      }}
     />
   );
 };
