@@ -44,21 +44,23 @@ export const Container = forwardRef<HTMLDivElement, Props>(
         tabIndex={onClick ? 0 : undefined}
       >
         {renderContainer ? (
-          renderContainer({ containerMeta, handleProps, onRemove })
+          renderContainer({ containerMeta, handleProps, onRemove, children })
         ) : (
-          <div>
-            {label}
+          <>
             <div>
-              <div onClick={onRemove}>
-                <Remove />
-              </div>
-              <div {...handleProps}>
-                <Handle />
+              {label}
+              <div>
+                <div onClick={onRemove}>
+                  <Remove />
+                </div>
+                <div {...handleProps}>
+                  <Handle />
+                </div>
               </div>
             </div>
-          </div>
+            <div style={{ minHeight: '400px' }}>{children}</div>
+          </>
         )}
-        <div>{children}</div>
       </Component>
     );
   },

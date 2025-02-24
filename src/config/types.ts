@@ -64,5 +64,6 @@ export interface ConstructorInterface {
     containerMeta: ConfigColumnInterface;
     handleProps: any;
     onRemove: VoidFunction;
+    children: any;
   }) => React.ReactElement;
 }

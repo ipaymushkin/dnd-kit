@@ -34,10 +34,12 @@ const App = () => {
           </div>
         );
       }}
-      renderContainer={({ containerMeta, handleProps, onRemove }) => {
+      renderContainer={({ containerMeta, handleProps, onRemove, children }) => {
         return (
           <div>
             <div>{containerMeta.label}</div>
+            {/*<div {...handleProps}>drag</div>*/}
+            <div>{children}</div>
           </div>
         );
       }}

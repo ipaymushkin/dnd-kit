@@ -70,6 +70,8 @@ export const Item = React.memo(
         };
       }, [dragOverlay]);
 
+      console.log(value, itemCardLabelKey);
+
       return (
         <ItemWrapper
           tX={transform ? `${Math.round(transform.x)}px` : undefined}
