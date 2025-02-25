@@ -110,8 +110,8 @@ const App = () => {
             </li>
           </ul>
         </li>
+        <li>groupByField - поле для группировки (необязательное поле)</li>
       </ul>
-
       <textarea
         style={{ width: '100%', height: '200px' }}
         value={config}
