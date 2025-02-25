@@ -68,7 +68,7 @@ export const Constructor = ({
     meta.columns.reduce((previousValue, currentValue) => {
       return Object.assign(previousValue, {
         [`${currentValue.value ?? otherColumnsValue}`]:
-          groupedList[currentValue.value ?? otherColumnsValue],
+          groupedList[currentValue.value ?? otherColumnsValue] || [],
       });
     }, {}),
   );

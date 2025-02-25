@@ -4,6 +4,7 @@ export const meta: ConfigInterface = {
   columnField: 'status',
   itemUniqKey: 'id',
   itemCardLabelKey: 'id',
+  groupByField: 'group_id',
   columns: [
     {
       label: 'Первая колонка',

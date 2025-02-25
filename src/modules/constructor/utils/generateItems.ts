@@ -18,9 +18,13 @@ export const generateItems = ({
   return Array(count)
     .fill(0)
     .map((_, idx: number) => {
-      return {
+      const el = {
         id: `item_${idx}`,
         [meta.columnField]: columns[getRandomInt(columns.length)],
       };
+      if (meta.groupByField) {
+        el[meta.groupByField] = getRandomInt(3);
+      }
+      return el;
     });
 };

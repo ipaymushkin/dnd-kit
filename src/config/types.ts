@@ -22,6 +22,8 @@ export interface ConfigInterface {
   itemUniqKey: string;
   // название поля для вывода в карточке
   itemCardLabelKey?: string;
+  // поле для группировки по разным agile
+  groupByField?: string;
 }
 
 export type ItemType = { [key: string]: any };

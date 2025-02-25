@@ -39,10 +39,8 @@ export const Container = forwardRef<HTMLDivElement, Props>(
     }: Props,
     ref,
   ) => {
-    const Component = onClick ? 'button' : 'div';
-
     return (
-      <Component
+      <div
         {...props}
         ref={ref}
         style={style}
@@ -76,7 +74,7 @@ export const Container = forwardRef<HTMLDivElement, Props>(
             <div style={{ minHeight: '400px' }}>{children}</div>
           </>
         )}
-      </Component>
+      </div>
     );
   },
 );
