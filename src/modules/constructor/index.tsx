@@ -36,6 +36,7 @@ import {
   ItemsType,
   ItemType,
 } from '../../config/types.ts';
+import { ConstructorContext } from './context.tsx';
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -272,7 +273,6 @@ export const Constructor = ({
           isDragging: true,
           isDragOverlay: true,
         })}
-        renderItem={renderItem}
         dragOverlay
         itemCardLabelKey={meta.itemCardLabelKey}
       />
@@ -285,7 +285,6 @@ export const Constructor = ({
     return (
       <Container
         label={containerMeta?.label}
-        renderContainer={renderContainer}
         style={getContainerStyle({
           container: containerMeta,
           isOverlay: true,
@@ -308,7 +307,6 @@ export const Constructor = ({
                 isSorting: false,
                 isDragOverlay: false,
               })}
-              renderItem={renderItem}
               itemCardLabelKey={meta.itemCardLabelKey}
             />
           );
@@ -328,96 +326,96 @@ export const Constructor = ({
   }, [items]);
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={collisionDetectionStrategy}
-      measuring={{
-        droppable: {
-          strategy: MeasuringStrategy.Always,
-        },
-      }}
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDragEnd={onDragEnd}
-      onDragCancel={onDragCancel}
-    >
-      <div
-        style={{
-          display: 'grid',
-          columnGap: '10px',
-          gridTemplateColumns: `repeat(${meta.columns.length}, 1fr)`,
+    <ConstructorContext.Provider value={{ renderItem, renderContainer }}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={collisionDetectionStrategy}
+        measuring={{
+          droppable: {
+            strategy: MeasuringStrategy.Always,
+          },
         }}
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        onDragEnd={onDragEnd}
+        onDragCancel={onDragCancel}
       >
-        <SortableContext
-          items={containers}
-          strategy={horizontalListSortingStrategy}
+        <div
+          style={{
+            display: 'grid',
+            columnGap: '10px',
+            gridTemplateColumns: `repeat(${meta.columns.length}, 1fr)`,
+          }}
         >
-          {containers.map((containerId, idx: number) => {
-            const containerMeta = getContainerMetaByContainerId(containerId);
+          <SortableContext
+            items={containers}
+            strategy={horizontalListSortingStrategy}
+          >
+            {containers.map((containerId, idx: number) => {
+              const containerMeta = getContainerMetaByContainerId(containerId);
 
-            if (!containerMeta) {
-              return <div>Проблема с колонкой {containerId}</div>;
-            }
+              if (!containerMeta) {
+                return <div>Проблема с колонкой {containerId}</div>;
+              }
 
-            const contextItems = items[containerId].map(el => ({
-              id: el[meta.itemUniqKey],
-            })) as any[];
+              const contextItems = items[containerId].map(el => ({
+                id: el[meta.itemUniqKey],
+              })) as any[];
 
-            return (
-              <DroppableContainer
-                containerMeta={containerMeta}
-                key={containerId}
-                id={containerId}
-                label={containerMeta.label}
-                renderContainer={renderContainer}
-                items={items[containerId]}
-                style={getContainerStyle({
-                  container: containerMeta,
-                  index: idx,
-                  isOverlay: false,
-                })}
-                onRemove={() => handleRemove(containerId)}
-                onRemoveContainer={onRemoveContainer}
-                hideColumnSorting={hideColumnSorting}
-                hideColumnRemove={hideColumnRemove}
-              >
-                <SortableContext
-                  items={contextItems}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {items[containerId].map((value, index) => {
-                    return (
-                      <SortableItem
-                        key={value[meta.itemUniqKey]}
-                        id={value[meta.itemUniqKey]}
-                        disabled={isSortingContainer}
-                        index={index}
-                        customItemHandle={customItemHandle}
-                        getItemStyles={getItemStyles}
-                        renderItem={renderItem}
-                        getIndex={getIndex}
-                        item={value}
-                        containerMeta={containerMeta}
-                        itemCardLabelKey={meta.itemCardLabelKey}
-                      />
-                    );
+              return (
+                <DroppableContainer
+                  containerMeta={containerMeta}
+                  key={containerId}
+                  id={containerId}
+                  label={containerMeta.label}
+                  items={items[containerId]}
+                  style={getContainerStyle({
+                    container: containerMeta,
+                    index: idx,
+                    isOverlay: false,
                   })}
-                </SortableContext>
-              </DroppableContainer>
-            );
-          })}
-        </SortableContext>
-      </div>
-      {createPortal(
-        <DragOverlay dropAnimation={dropAnimation}>
-          {activeEl
-            ? containers.includes(activeEl.id)
-              ? renderContainerDragOverlay(activeEl)
-              : renderSortableItemDragOverlay(activeEl)
-            : null}
-        </DragOverlay>,
-        document.body,
-      )}
-    </DndContext>
+                  onRemove={() => handleRemove(containerId)}
+                  onRemoveContainer={onRemoveContainer}
+                  hideColumnSorting={hideColumnSorting}
+                  hideColumnRemove={hideColumnRemove}
+                >
+                  <SortableContext
+                    items={contextItems}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {items[containerId].map((value, index) => {
+                      return (
+                        <SortableItem
+                          key={value[meta.itemUniqKey]}
+                          id={value[meta.itemUniqKey]}
+                          disabled={isSortingContainer}
+                          index={index}
+                          customItemHandle={customItemHandle}
+                          getItemStyles={getItemStyles}
+                          getIndex={getIndex}
+                          item={value}
+                          containerMeta={containerMeta}
+                          itemCardLabelKey={meta.itemCardLabelKey}
+                        />
+                      );
+                    })}
+                  </SortableContext>
+                </DroppableContainer>
+              );
+            })}
+          </SortableContext>
+        </div>
+        {createPortal(
+          <DragOverlay dropAnimation={dropAnimation}>
+            {activeEl
+              ? containers.includes(activeEl.id)
+                ? renderContainerDragOverlay(activeEl)
+                : renderSortableItemDragOverlay(activeEl)
+              : null}
+          </DragOverlay>,
+          document.body,
+        )}
+      </DndContext>
+    </ConstructorContext.Provider>
   );
 };

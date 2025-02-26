@@ -25,7 +25,6 @@ const SortableItem = memo(
     id,
     index,
     customItemHandle,
-    renderItem,
     getIndex,
     item,
     containerMeta,
@@ -33,7 +32,6 @@ const SortableItem = memo(
     itemCardLabelKey,
   }: SortableItemProps & {
     getItemStyles: ConstructorInterface['getItemStyles'];
-    renderItem: ConstructorInterface['renderItem'];
     itemCardLabelKey?: ConfigInterface['itemCardLabelKey'];
     customItemHandle?: ConstructorInterface['customItemHandle'];
   }) => {
@@ -81,7 +79,6 @@ const SortableItem = memo(
         transform={transform}
         fadeIn={mountedWhileDragging}
         listeners={listeners}
-        renderItem={renderItem}
         itemCardLabelKey={itemCardLabelKey}
       />
     );

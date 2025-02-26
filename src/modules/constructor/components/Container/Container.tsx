@@ -1,10 +1,11 @@
-import React, { forwardRef, memo } from 'react';
+import React, { forwardRef, memo, useContext } from 'react';
 import { Remove } from '../../icons/Remove.tsx';
 import Handle from '../../icons/Handle.tsx';
 import {
   ConfigColumnInterface,
   ConstructorInterface,
 } from '../../../../config/types.ts';
+import { ConstructorContext } from '../../context.tsx';
 
 export type Props = {
   children: React.ReactNode;
@@ -14,7 +15,6 @@ export type Props = {
   onClick?: () => void;
   onRemove?: () => void;
 } & {
-  renderContainer?: ConstructorInterface['renderContainer'];
   containerMeta: ConfigColumnInterface;
   onRemoveContainer: ConstructorInterface['onRemoveContainer'];
   hideColumnSorting: ConstructorInterface['hideColumnSorting'];
@@ -31,7 +31,6 @@ export const Container = memo(
         onRemove,
         label,
         style,
-        renderContainer,
         containerMeta,
         onRemoveContainer,
         hideColumnSorting,
@@ -40,6 +39,8 @@ export const Container = memo(
       }: Props,
       ref,
     ) => {
+      const { renderContainer } = useContext(ConstructorContext);
+
       return (
         <div
           {...props}

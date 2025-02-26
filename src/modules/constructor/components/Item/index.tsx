@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useEffect } from 'react';
+import React, { forwardRef, memo, useContext, useEffect } from 'react';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 
@@ -8,6 +8,7 @@ import {
   ConstructorInterface,
   ItemType,
 } from '../../../../config/types.ts';
+import { ConstructorContext } from '../../context.tsx';
 
 type Props = {
   dragOverlay?: boolean;
@@ -24,7 +25,6 @@ type Props = {
   transition?: string | null;
   wrapperStyle?: React.CSSProperties;
   value: ItemType;
-  renderItem: ConstructorInterface['renderItem'];
   container: ConfigColumnInterface;
 } & {
   itemCardLabelKey?: ConfigInterface['itemCardLabelKey'];
@@ -44,7 +44,6 @@ export const Item = memo(
         // height,
         index,
         listeners,
-        renderItem,
         sorting,
         style,
         transition,
@@ -55,6 +54,8 @@ export const Item = memo(
       },
       ref,
     ) => {
+      const { renderItem } = useContext(ConstructorContext);
+
       useEffect(() => {
         if (!dragOverlay) {
           return;
