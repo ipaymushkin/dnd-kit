@@ -15,8 +15,7 @@
     "@types/lodash": "^4.17.15",
     "lodash": "^4.17.21",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "styled-components": "^6.1.15"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@dnd-kit/sortable": "^10.0.0",

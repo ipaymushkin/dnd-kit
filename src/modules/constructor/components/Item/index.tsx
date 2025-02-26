@@ -8,9 +8,6 @@ import {
   ConstructorInterface,
   ItemType,
 } from '../../../../config/types.ts';
-import { Remove } from '../../icons/Remove.tsx';
-import Handle from '../../icons/Handle.tsx';
-import styled from 'styled-components';
 
 type Props = {
   dragOverlay?: boolean;
@@ -70,12 +67,19 @@ export const Item = React.memo(
         };
       }, [dragOverlay]);
 
+      let transformStr = undefined;
+      if (transform) {
+        transformStr = `translate3d(${Math.round(transform.x)}px, ${Math.round(transform.y)}px, 0) scaleX(${transform.scaleX}) scaleY(${transform.scaleY})`;
+      }
+
       return (
-        <ItemWrapper
-          tX={transform ? `${Math.round(transform.x)}px` : undefined}
-          tY={transform ? `${Math.round(transform.y)}px` : undefined}
-          sX={transform?.scaleX ? `${transform.scaleX}` : undefined}
-          sY={transform?.scaleY ? `${transform.scaleY}` : undefined}
+        <div
+          style={{
+            display: 'flex',
+            transformOrigin: '0 0',
+            touchAction: 'manipulation',
+            transform: transformStr,
+          }}
           ref={ref}
           data-cypress="draggable-item"
           {...(!customItemHandle ? listeners : undefined)}
@@ -99,22 +103,8 @@ export const Item = React.memo(
                 handleProps,
               })
             : value[itemCardLabelKey]}
-        </ItemWrapper>
+        </div>
       );
     },
   ),
 );
-
-const ItemWrapper = styled.div<{
-  tX?: string;
-  tY?: string;
-  sX?: string;
-  sY?: string;
-}>`
-  display: flex;
-  box-sizing: border-box;
-  transform: translate3d(${({ tX }) => tX}, ${({ tY }) => tY}, 0)
-    scaleX(${({ sX }) => sX}) scaleY(${({ sY }) => sY});
-  transform-origin: 0 0;
-  touch-action: manipulation;
-`;

@@ -36,7 +36,6 @@ import {
   ItemsType,
   ItemType,
 } from '../../config/types.ts';
-import styled from 'styled-components';
 
 const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -342,7 +341,13 @@ export const Constructor = ({
       onDragEnd={onDragEnd}
       onDragCancel={onDragCancel}
     >
-      <Wrapper columns={meta.columns.length}>
+      <div
+        style={{
+          display: 'grid',
+          columnGap: '10px',
+          gridTemplateColumns: `repeat(${meta.columns.length}, 1fr)`,
+        }}
+      >
         <SortableContext
           items={containers}
           strategy={horizontalListSortingStrategy}
@@ -402,7 +407,7 @@ export const Constructor = ({
             );
           })}
         </SortableContext>
-      </Wrapper>
+      </div>
       {createPortal(
         <DragOverlay dropAnimation={dropAnimation}>
           {activeEl
@@ -416,9 +421,3 @@ export const Constructor = ({
     </DndContext>
   );
 };
-
-const Wrapper = styled.div<{ columns: number }>`
-  display: grid;
-  grid-template-columns: repeat(${({ columns }) => columns}, 1fr);
-  column-gap: 10px;
-`;
