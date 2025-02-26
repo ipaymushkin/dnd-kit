@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { forwardRef, memo, useEffect } from 'react';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 
@@ -31,8 +31,8 @@ type Props = {
   customItemHandle?: ConstructorInterface['customItemHandle'];
 };
 
-export const Item = React.memo(
-  React.forwardRef<HTMLLIElement, Props>(
+export const Item = memo(
+  forwardRef<HTMLLIElement, Props>(
     (
       {
         dragOverlay,

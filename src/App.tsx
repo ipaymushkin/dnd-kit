@@ -1,7 +1,7 @@
 import { Constructor } from './modules/constructor';
 import { meta } from './config/meta.ts';
 import { generateItems } from './modules/constructor/utils/generateItems.ts';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { groupBy } from 'lodash';
 import './style.css';
 
@@ -135,131 +135,137 @@ const TypeStr = ({ variant }: { variant: 0 | 1 | 2 }) => {
 };
 
 const ConstructorModule = ({ config, items }: any) => {
+  const renderItem = useCallback(
+    ({
+      value,
+      transition,
+      transform,
+      ref,
+      index,
+      listeners,
+      style,
+      fadeIn,
+      sorting,
+      dragOverlay,
+      dragging,
+      disabled,
+      handleProps,
+    }: any) => {
+      const styleObj = {
+        background: '#1B1E21',
+        padding: '10px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '8px',
+        width: '100%',
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        marginBottom: '10px',
+      } as React.CSSProperties;
+
+      if (dragging) {
+        styleObj['opacity'] = `0.5`;
+      }
+
+      return (
+        <div style={styleObj}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '10px',
+              alignItems: 'center',
+              fontSize: '14px',
+            }}
+          >
+            {[<Status1 />, <Status2 />][value.id % 2]}
+            <div>CubeKit-{value.id}</div>
+          </div>
+          <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
+            {descriptions[value.id % descriptions.length]}
+          </div>
+          <div
+            style={{
+              width: '100%',
+              height: '1px',
+              background: 'rgba(255, 255, 255, 0.25)',
+            }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div
+              style={{
+                width: '20px',
+                height: '20px',
+                borderRadius: '50%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '8px',
+                background: ['#D154A7', '#5E5CE6', '#AC8E68'][value.id % 3],
+              }}
+            >
+              {['АВ', 'ВП', 'ИШ', 'ЛП'][value.id % 4]}
+            </div>
+            <TypeStr variant={value.id % 3} />
+          </div>
+          {/*<div {...listeners} {...handleProps}>*/}
+          {/*  drag*/}
+          {/*</div>*/}
+        </div>
+      );
+    },
+    [],
+  );
+
+  const renderContainer = useCallback(
+    ({ containerMeta, handleProps, onRemove, children }: any) => {
+      return (
+        <div>
+          <div
+            style={{
+              background: '#1B1E21',
+              padding: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              marginBottom: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div
+              style={{
+                padding: '5px',
+                color: containerMeta.color,
+                background: hexToRGB(containerMeta.color, 0.15),
+                width: 'auto',
+                display: 'inline-block',
+              }}
+            >
+              {containerMeta.label}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <AddIcon />
+              <MoreIcon />
+            </div>
+          </div>
+          {/*<div {...handleProps}>drag</div>*/}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {children}
+          </div>
+        </div>
+      );
+    },
+    [],
+  );
+
   return (
     <Constructor
       meta={config}
       list={items}
       // customItemHandle={true}
-      renderItem={({
-        value,
-        transition,
-        transform,
-        ref,
-        index,
-        listeners,
-        style,
-        fadeIn,
-        sorting,
-        dragOverlay,
-        dragging,
-        disabled,
-        handleProps,
-      }) => {
-        const styleObj = {
-          background: '#1B1E21',
-          padding: '10px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '8px',
-          width: '100%',
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-          marginBottom: '10px',
-        } as React.CSSProperties;
-
-        if (dragging) {
-          styleObj['opacity'] = `0.5`;
-        }
-
-        return (
-          <div style={styleObj}>
-            <div
-              style={{
-                display: 'flex',
-                gap: '10px',
-                alignItems: 'center',
-                fontSize: '14px',
-              }}
-            >
-              {[<Status1 />, <Status2 />][value.id % 2]}
-              <div>CubeKit-{value.id}</div>
-            </div>
-            <div
-              style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}
-            >
-              {descriptions[value.id % descriptions.length]}
-            </div>
-            <div
-              style={{
-                width: '100%',
-                height: '1px',
-                background: 'rgba(255, 255, 255, 0.25)',
-              }}
-            />
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '8px',
-                  background: ['#D154A7', '#5E5CE6', '#AC8E68'][value.id % 3],
-                }}
-              >
-                {['АВ', 'ВП', 'ИШ', 'ЛП'][value.id % 4]}
-              </div>
-              <TypeStr variant={value.id % 3} />
-            </div>
-            {/*<div {...listeners} {...handleProps}>*/}
-            {/*  drag*/}
-            {/*</div>*/}
-          </div>
-        );
-      }}
-      renderContainer={({ containerMeta, handleProps, onRemove, children }) => {
-        return (
-          <div>
-            <div
-              style={{
-                background: '#1B1E21',
-                padding: '10px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '8px',
-                marginBottom: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div
-                style={{
-                  padding: '5px',
-                  color: containerMeta.color,
-                  background: hexToRGB(containerMeta.color, 0.15),
-                  width: 'auto',
-                  display: 'inline-block',
-                }}
-              >
-                {containerMeta.label}
-              </div>
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-              >
-                <AddIcon />
-                <MoreIcon />
-              </div>
-            </div>
-            {/*<div {...handleProps}>drag</div>*/}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {children}
-            </div>
-          </div>
-        );
-      }}
+      renderItem={renderItem}
+      renderContainer={renderContainer}
       // onRemoveContainer={container => {
       //   console.log(container);
       // }}
@@ -279,7 +285,7 @@ const App = () => {
     ),
   );
 
-  const [ready, setReady] = useState<boolean>(false);
+  const [ready, setReady] = useState<boolean>(true);
 
   if (ready) {
     const parsedConfig = JSON.parse(config);

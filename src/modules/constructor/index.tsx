@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   defaultDropAnimationSideEffects,
@@ -317,9 +317,9 @@ export const Constructor = ({
     );
   };
 
-  const handleRemove = (containerID: UniqueIdentifier) => {
+  const handleRemove = useCallback((containerID: UniqueIdentifier) => {
     setContainers(containers => containers.filter(id => id !== containerID));
-  };
+  }, []);
 
   useEffect(() => {
     requestAnimationFrame(() => {
