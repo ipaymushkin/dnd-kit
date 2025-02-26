@@ -50,14 +50,10 @@ const dropAnimation: DropAnimation = {
 
 export const Constructor = ({
   customItemHandle = false,
-  getContainerStyle = () => ({}),
   renderItem,
   renderContainer,
   meta,
   list,
-  onRemoveContainer,
-  hideColumnSorting,
-  hideColumnRemove,
 }: ConstructorInterface & { meta: ConfigInterface; list: ItemsType[] }) => {
   const groupedList = useMemo(() => {
     return groupBy(list, meta.columnField);
@@ -105,10 +101,6 @@ export const Constructor = ({
       : (meta.columns.find(
           el => el.value === containerId,
         ) as ConfigColumnInterface);
-  };
-
-  const getItemByItemId = (itemId: UniqueIdentifier) => {
-    return list.find(el => el[meta.itemUniqKey] === itemId) as ItemType;
   };
 
   const findContainer = (id: UniqueIdentifier) => {
@@ -272,18 +264,11 @@ export const Constructor = ({
     const containerMeta = getContainerMetaByContainerId(container.id);
     if (!containerMeta) return null;
     return (
-      <Container
-        label={containerMeta?.label}
-        style={getContainerStyle({
-          container: containerMeta,
-          isOverlay: true,
-        })}
-        containerMeta={containerMeta}
-      >
+      <Container containerMeta={containerMeta}>
         {items[container.id].map(item => {
           return (
             <Item
-              key={item[meta.itemUniqKey]}
+              key={`overlay_${item[meta.itemUniqKey]}`}
               value={item}
               container={containerMeta}
               customItemHandle={customItemHandle}
@@ -309,8 +294,6 @@ export const Constructor = ({
       value={{
         renderItem,
         renderContainer,
-        hideColumnRemove,
-        hideColumnSorting,
       }}
     >
       <DndContext
@@ -353,15 +336,8 @@ export const Constructor = ({
                   containerMeta={containerMeta}
                   key={containerId}
                   id={containerId}
-                  label={containerMeta.label}
                   items={items[containerId]}
-                  style={getContainerStyle({
-                    container: containerMeta,
-                    index: idx,
-                    isOverlay: false,
-                  })}
                   onRemove={() => handleRemove(containerId)}
-                  onRemoveContainer={onRemoveContainer}
                 >
                   <SortableContext
                     items={contextItems}

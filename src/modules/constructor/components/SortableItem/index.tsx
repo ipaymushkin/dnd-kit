@@ -4,7 +4,6 @@ import { useMountStatus } from '../../hooks/useMountStatus.ts';
 import { Item } from '../Item';
 import {
   ConfigColumnInterface,
-  ConfigInterface,
   ConstructorInterface,
   ItemType,
 } from '../../../../config/types.ts';

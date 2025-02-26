@@ -1,10 +1,9 @@
-import React, { forwardRef, memo, useContext, useEffect } from 'react';
+import { forwardRef, memo, useContext, useEffect } from 'react';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 
 import {
   ConfigColumnInterface,
-  ConfigInterface,
   ConstructorInterface,
   ItemType,
 } from '../../../../config/types.ts';
@@ -22,14 +21,10 @@ type Props = {
   listeners?: DraggableSyntheticListeners;
   sorting?: boolean;
   transition?: string | null;
-  wrapperStyle?: React.CSSProperties;
   value: ItemType;
   container: ConfigColumnInterface;
 } & {
   customItemHandle?: ConstructorInterface['customItemHandle'];
-  isDragging?: boolean;
-  isSorting?: boolean;
-  isDragOverlay?: boolean;
 };
 
 export const Item = memo(

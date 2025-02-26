@@ -263,12 +263,8 @@ const ConstructorModule = ({ config, items }: any) => {
     <Constructor
       meta={config}
       list={items}
-      // customItemHandle={true}
       renderItem={renderItem}
       renderContainer={renderContainer}
-      // onRemoveContainer={container => {
-      //   console.log(container);
-      // }}
     />
   );
 };

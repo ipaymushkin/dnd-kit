@@ -5,7 +5,7 @@ import {
 } from '@dnd-kit/sortable';
 import { Container, ContainerProps } from '../Container';
 import { UniqueIdentifier } from '@dnd-kit/core';
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { CSS } from '@dnd-kit/utilities';
 import { ItemsType } from '../../../../config/types.ts';
 
@@ -18,13 +18,11 @@ const DroppableContainer = memo(
     disabled,
     id,
     items,
-    style,
     ...props
   }: ContainerProps & {
     disabled?: boolean;
     id: UniqueIdentifier;
     items: ItemsType[];
-    style?: React.CSSProperties;
   }) => {
     const {
       active,
@@ -52,7 +50,6 @@ const DroppableContainer = memo(
       <Container
         ref={disabled ? undefined : setNodeRef}
         style={{
-          ...style,
           transition,
           transform: CSS.Translate.toString(transform),
           opacity: isDragging ? 0.5 : undefined,

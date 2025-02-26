@@ -31,12 +31,6 @@ export type ItemType = { [key: string]: any };
 export type ItemsType = Record<UniqueIdentifier, ItemType>;
 
 export interface ConstructorInterface {
-  getContainerStyle?: (args: {
-    container: ConfigColumnInterface;
-    index?: number;
-    isOverlay: boolean;
-  }) => React.CSSProperties;
-  wrapperStyle?: (args: { index: number }) => React.CSSProperties;
   customItemHandle?: boolean;
   renderItem: (args: {
     dragOverlay: boolean;
@@ -52,13 +46,10 @@ export interface ConstructorInterface {
     disabled: boolean;
     handleProps: any;
   }) => React.ReactElement;
-  renderContainer?: (args: {
+  renderContainer: (args: {
     containerMeta: ConfigColumnInterface;
     handleProps: any;
     onRemove: VoidFunction;
     children: any;
   }) => React.ReactElement;
-  onRemoveContainer?: (container: ConfigColumnInterface) => void;
-  hideColumnSorting?: boolean;
-  hideColumnRemove?: boolean;
 }
