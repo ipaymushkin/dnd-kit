@@ -95,189 +95,207 @@ export const Constructor = ({
     }),
   );
 
-  const getContainerMetaByContainerId = (containerId: UniqueIdentifier) => {
-    return containerId === otherColumnsValue
-      ? meta.columns.find(el => el.isCollectively)
-      : (meta.columns.find(
-          el => el.value === containerId,
-        ) as ConfigColumnInterface);
-  };
+  const getContainerMetaByContainerId = useCallback(
+    (containerId: UniqueIdentifier) => {
+      return containerId === otherColumnsValue
+        ? meta.columns.find(el => el.isCollectively)
+        : (meta.columns.find(
+            el => el.value === containerId,
+          ) as ConfigColumnInterface);
+    },
+    [meta.columns],
+  );
 
-  const findContainer = (id: UniqueIdentifier) => {
-    if (id in items) {
-      return id;
-    }
+  const findContainer = useCallback(
+    (id: UniqueIdentifier) => {
+      if (id in items) {
+        return id;
+      }
 
-    return Object.keys(items).find(key =>
-      items[key].find(el => el[meta.itemUniqKey] === id),
-    );
-  };
+      return Object.keys(items).find(key =>
+        items[key].find(el => el[meta.itemUniqKey] === id),
+      );
+    },
+    [items, meta.itemUniqKey],
+  );
 
-  const getIndex = (id: UniqueIdentifier) => {
-    const container = findContainer(id);
+  const getIndex = useCallback(
+    (id: UniqueIdentifier) => {
+      const container = findContainer(id);
 
-    if (!container) {
-      return -1;
-    }
+      if (!container) {
+        return -1;
+      }
 
-    return items[container].indexOf(id);
-  };
+      return items[container].indexOf(id);
+    },
+    [findContainer, items],
+  );
 
-  const onDragCancel = () => {
+  const onDragCancel = useCallback(() => {
     if (clonedItems) {
       setItems(clonedItems);
     }
 
     setActiveEl(null);
     setClonedItems(null);
-  };
+  }, [clonedItems]);
 
-  const onDragStart = ({ active }: any) => {
-    setActiveEl(active);
-    setClonedItems(items);
-  };
+  const onDragStart = useCallback(
+    ({ active }: any) => {
+      setActiveEl(active);
+      setClonedItems(items);
+    },
+    [items],
+  );
 
-  const onDragOver = ({ active, over }: any) => {
-    const overId = over?.id;
+  const onDragOver = useCallback(
+    ({ active, over }: any) => {
+      const overId = over?.id;
 
-    if (overId == null || active.id in items) {
-      return;
-    }
+      if (overId == null || active.id in items) {
+        return;
+      }
 
-    const overContainer = findContainer(overId);
-    const activeContainer = findContainer(active.id);
+      const overContainer = findContainer(overId);
+      const activeContainer = findContainer(active.id);
 
-    if (!overContainer || !activeContainer) {
-      return;
-    }
+      if (!overContainer || !activeContainer) {
+        return;
+      }
 
-    if (activeContainer !== overContainer) {
-      setItems(items => {
-        const activeItems = items[activeContainer];
-        const overItems = items[overContainer];
-        const overIndex = overItems.findIndex(
-          el => el[meta.itemUniqKey] === overId,
-        );
-        const activeIndex = activeItems.findIndex(
+      if (activeContainer !== overContainer) {
+        setItems(items => {
+          const activeItems = items[activeContainer];
+          const overItems = items[overContainer];
+          const overIndex = overItems.findIndex(
+            el => el[meta.itemUniqKey] === overId,
+          );
+          const activeIndex = activeItems.findIndex(
+            el => el[meta.itemUniqKey] === active.id,
+          );
+
+          let newIndex: number;
+
+          if (overId in items) {
+            newIndex = overItems.length + 1;
+          } else {
+            const isBelowOverItem =
+              over &&
+              active.rect.current.translated &&
+              active.rect.current.translated.top >
+                over.rect.top + over.rect.height;
+
+            const modifier = isBelowOverItem ? 1 : 0;
+
+            newIndex =
+              overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
+          }
+
+          recentlyMovedToNewContainer.current = true;
+
+          return {
+            ...items,
+            [activeContainer]: items[activeContainer].filter(
+              item => item[meta.itemUniqKey] !== active.id,
+            ),
+            [overContainer]: [
+              ...items[overContainer].slice(0, newIndex),
+              items[activeContainer][activeIndex],
+              ...items[overContainer].slice(
+                newIndex,
+                items[overContainer].length,
+              ),
+            ],
+          };
+        });
+      }
+    },
+    [findContainer, items, meta.itemUniqKey],
+  );
+
+  const onDragEnd = useCallback(
+    ({ active, over }: any) => {
+      if (active.id in items && over?.id) {
+        setContainers(containers => {
+          const activeIndex = containers.indexOf(active.id);
+          const overIndex = containers.indexOf(over.id);
+
+          return arrayMove(containers, activeIndex, overIndex);
+        });
+      }
+
+      const activeContainer = findContainer(active.id);
+
+      if (!activeContainer) {
+        setActiveEl(null);
+        return;
+      }
+
+      const overId = over?.id;
+
+      if (overId == null) {
+        setActiveEl(null);
+        return;
+      }
+
+      const overContainer = findContainer(overId);
+
+      if (overContainer) {
+        const activeIndex = items[activeContainer].findIndex(
           el => el[meta.itemUniqKey] === active.id,
         );
+        const overIndex = items[overContainer].findIndex(
+          el => el[meta.itemUniqKey] === overId,
+        );
 
-        let newIndex: number;
-
-        if (overId in items) {
-          newIndex = overItems.length + 1;
-        } else {
-          const isBelowOverItem =
-            over &&
-            active.rect.current.translated &&
-            active.rect.current.translated.top >
-              over.rect.top + over.rect.height;
-
-          const modifier = isBelowOverItem ? 1 : 0;
-
-          newIndex =
-            overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
-        }
-
-        recentlyMovedToNewContainer.current = true;
-
-        return {
-          ...items,
-          [activeContainer]: items[activeContainer].filter(
-            item => item[meta.itemUniqKey] !== active.id,
-          ),
-          [overContainer]: [
-            ...items[overContainer].slice(0, newIndex),
-            items[activeContainer][activeIndex],
-            ...items[overContainer].slice(
-              newIndex,
-              items[overContainer].length,
+        if (activeIndex !== overIndex) {
+          setItems(items => ({
+            ...items,
+            [overContainer]: arrayMove(
+              items[overContainer],
+              activeIndex,
+              overIndex,
             ),
-          ],
-        };
-      });
-    }
-  };
-
-  const onDragEnd = ({ active, over }: any) => {
-    if (active.id in items && over?.id) {
-      setContainers(containers => {
-        const activeIndex = containers.indexOf(active.id);
-        const overIndex = containers.indexOf(over.id);
-
-        return arrayMove(containers, activeIndex, overIndex);
-      });
-    }
-
-    const activeContainer = findContainer(active.id);
-
-    if (!activeContainer) {
-      setActiveEl(null);
-      return;
-    }
-
-    const overId = over?.id;
-
-    if (overId == null) {
-      setActiveEl(null);
-      return;
-    }
-
-    const overContainer = findContainer(overId);
-
-    if (overContainer) {
-      const activeIndex = items[activeContainer].findIndex(
-        el => el[meta.itemUniqKey] === active.id,
-      );
-      const overIndex = items[overContainer].findIndex(
-        el => el[meta.itemUniqKey] === overId,
-      );
-
-      if (activeIndex !== overIndex) {
-        setItems(items => ({
-          ...items,
-          [overContainer]: arrayMove(
-            items[overContainer],
-            activeIndex,
-            overIndex,
-          ),
-        }));
+          }));
+        }
       }
-    }
 
-    setActiveEl(null);
-  };
+      setActiveEl(null);
+    },
+    [findContainer, items, meta.itemUniqKey],
+  );
 
-  const renderSortableItemDragOverlay = (item: ItemType) => {
-    const containerMeta = getContainerMetaByContainerId(findContainer(item.id));
-    return (
-      <Item
-        value={item}
-        containerMeta={containerMeta}
-        customItemHandle={customItemHandle}
-        dragOverlay
-      />
-    );
-  };
+  const renderSortableItemDragOverlay = useCallback(
+    (item: ItemType) => {
+      const containerMeta = getContainerMetaByContainerId(
+        findContainer(item.id),
+      );
+      return <Item value={item} containerMeta={containerMeta} dragOverlay />;
+    },
+    [findContainer, getContainerMetaByContainerId],
+  );
 
-  const renderContainerDragOverlay = (container: any) => {
-    const containerMeta = getContainerMetaByContainerId(container.id);
-    if (!containerMeta) return null;
-    return (
-      <Container containerMeta={containerMeta}>
-        {items[container.id].map(item => {
-          return (
-            <Item
-              key={`overlay_${item[meta.itemUniqKey]}`}
-              value={item}
-              container={containerMeta}
-              customItemHandle={customItemHandle}
-            />
-          );
-        })}
-      </Container>
-    );
-  };
+  const renderContainerDragOverlay = useCallback(
+    (container: any) => {
+      const containerMeta = getContainerMetaByContainerId(container.id);
+      if (!containerMeta) return null;
+      return (
+        <Container containerMeta={containerMeta}>
+          {items[container.id].map(item => {
+            return (
+              <Item
+                key={`overlay_${item[meta.itemUniqKey]}`}
+                value={item}
+                container={containerMeta}
+              />
+            );
+          })}
+        </Container>
+      );
+    },
+    [getContainerMetaByContainerId, items, meta.itemUniqKey],
+  );
 
   const handleRemove = useCallback((containerID: UniqueIdentifier) => {
     setContainers(containers => containers.filter(id => id !== containerID));
@@ -294,6 +312,7 @@ export const Constructor = ({
       value={{
         renderItem,
         renderContainer,
+        customItemHandle,
       }}
     >
       <DndContext
@@ -334,7 +353,7 @@ export const Constructor = ({
               return (
                 <DroppableContainer
                   containerMeta={containerMeta}
-                  key={containerId}
+                  key={`droppable_${containerId}`}
                   id={containerId}
                   items={items[containerId]}
                   onRemove={() => handleRemove(containerId)}
@@ -346,11 +365,10 @@ export const Constructor = ({
                     {items[containerId].map((value, index) => {
                       return (
                         <SortableItem
-                          key={value[meta.itemUniqKey]}
+                          key={`sortable_${value[meta.itemUniqKey]}`}
                           id={value[meta.itemUniqKey]}
                           disabled={isSortingContainer}
                           index={index}
-                          customItemHandle={customItemHandle}
                           getIndex={getIndex}
                           item={value}
                           containerMeta={containerMeta}

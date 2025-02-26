@@ -7,7 +7,8 @@ import {
   ConstructorInterface,
   ItemType,
 } from '../../../../config/types.ts';
-import { memo } from 'react';
+import { memo, useContext } from 'react';
+import { ConstructorContext } from '../../context.tsx';
 
 interface SortableItemProps {
   id: UniqueIdentifier;
@@ -23,13 +24,10 @@ const SortableItem = memo(
     disabled,
     id,
     index,
-    customItemHandle,
     getIndex,
     item,
     containerMeta,
-  }: SortableItemProps & {
-    customItemHandle?: ConstructorInterface['customItemHandle'];
-  }) => {
+  }: SortableItemProps) => {
     const {
       setNodeRef,
       setActivatorNodeRef,
@@ -43,6 +41,7 @@ const SortableItem = memo(
     } = useSortable({
       id,
     });
+    const { customItemHandle } = useContext(ConstructorContext);
     const mounted = useMountStatus();
     const mountedWhileDragging = isDragging && !mounted;
 
@@ -53,7 +52,6 @@ const SortableItem = memo(
         container={containerMeta}
         dragging={isDragging}
         sorting={isSorting}
-        customItemHandle={customItemHandle}
         handleProps={
           customItemHandle ? { ref: setActivatorNodeRef } : undefined
         }

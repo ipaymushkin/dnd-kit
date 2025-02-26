@@ -1,12 +1,8 @@
-import { forwardRef, memo, useContext, useEffect } from 'react';
+import { forwardRef, memo, useContext, useEffect, useMemo } from 'react';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 
-import {
-  ConfigColumnInterface,
-  ConstructorInterface,
-  ItemType,
-} from '../../../../config/types.ts';
+import { ConfigColumnInterface, ItemType } from '../../../../config/types.ts';
 import { ConstructorContext } from '../../context.tsx';
 
 type Props = {
@@ -23,8 +19,6 @@ type Props = {
   transition?: string | null;
   value: ItemType;
   container: ConfigColumnInterface;
-} & {
-  customItemHandle?: ConstructorInterface['customItemHandle'];
 };
 
 export const Item = memo(
@@ -35,7 +29,6 @@ export const Item = memo(
         dragging,
         disabled = false,
         fadeIn,
-        customItemHandle,
         handleProps,
         // height,
         index,
@@ -48,7 +41,7 @@ export const Item = memo(
       },
       ref,
     ) => {
-      const { renderItem } = useContext(ConstructorContext);
+      const { renderItem, customItemHandle } = useContext(ConstructorContext);
 
       useEffect(() => {
         if (!dragOverlay) {
@@ -62,10 +55,13 @@ export const Item = memo(
         };
       }, [dragOverlay]);
 
-      let transformStr = undefined;
-      if (transform) {
-        transformStr = `translate3d(${Math.round(transform.x)}px, ${Math.round(transform.y)}px, 0) scaleX(${transform.scaleX}) scaleY(${transform.scaleY})`;
-      }
+      const transformStr = useMemo(() => {
+        let tr = undefined;
+        if (transform) {
+          tr = `translate3d(${Math.round(transform.x)}px, ${Math.round(transform.y)}px, 0) scaleX(${transform.scaleX}) scaleY(${transform.scaleY})`;
+        }
+        return tr;
+      }, [transform]);
 
       return (
         <div
