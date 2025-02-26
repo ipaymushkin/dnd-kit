@@ -21,14 +21,15 @@ type Props = {
   transform?: Transform | null;
   listeners?: DraggableSyntheticListeners;
   sorting?: boolean;
-  style?: React.CSSProperties;
   transition?: string | null;
   wrapperStyle?: React.CSSProperties;
   value: ItemType;
   container: ConfigColumnInterface;
 } & {
-  itemCardLabelKey?: ConfigInterface['itemCardLabelKey'];
   customItemHandle?: ConstructorInterface['customItemHandle'];
+  isDragging?: boolean;
+  isSorting?: boolean;
+  isDragOverlay?: boolean;
 };
 
 export const Item = memo(
@@ -45,11 +46,9 @@ export const Item = memo(
         index,
         listeners,
         sorting,
-        style,
         transition,
         transform,
         value,
-        itemCardLabelKey,
         ...props
       },
       ref,
@@ -87,23 +86,20 @@ export const Item = memo(
           {...props}
           tabIndex={!customItemHandle ? 0 : undefined}
         >
-          {renderItem
-            ? renderItem({
-                dragOverlay: Boolean(dragOverlay),
-                dragging: Boolean(dragging),
-                sorting: Boolean(sorting),
-                index,
-                fadeIn: Boolean(fadeIn),
-                listeners,
-                ref,
-                style,
-                transform,
-                transition,
-                value,
-                disabled,
-                handleProps,
-              })
-            : value[itemCardLabelKey]}
+          {renderItem({
+            dragOverlay: Boolean(dragOverlay),
+            dragging: Boolean(dragging),
+            sorting: Boolean(sorting),
+            index,
+            fadeIn: Boolean(fadeIn),
+            listeners,
+            ref,
+            transform,
+            transition,
+            value,
+            disabled,
+            handleProps,
+          })}
         </div>
       );
     },

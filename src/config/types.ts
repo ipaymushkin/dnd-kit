@@ -22,8 +22,6 @@ export interface ConfigInterface {
   columns: ConfigColumnInterface[];
   // уникальное поле для item
   itemUniqKey: string;
-  // название поля для вывода в карточке
-  itemCardLabelKey?: string;
   // поле для группировки по разным agile
   groupByField?: string;
 }
@@ -38,18 +36,9 @@ export interface ConstructorInterface {
     index?: number;
     isOverlay: boolean;
   }) => React.CSSProperties;
-  getItemStyles?: (args: {
-    item: ItemType;
-    index: number;
-    overIndex: number;
-    isDragging: boolean;
-    container: ConfigColumnInterface;
-    isSorting: boolean;
-    isDragOverlay: boolean;
-  }) => React.CSSProperties;
   wrapperStyle?: (args: { index: number }) => React.CSSProperties;
   customItemHandle?: boolean;
-  renderItem?: (args: {
+  renderItem: (args: {
     dragOverlay: boolean;
     dragging: boolean;
     sorting: boolean;
@@ -57,7 +46,6 @@ export interface ConstructorInterface {
     fadeIn: boolean;
     listeners: DraggableSyntheticListeners;
     ref: React.Ref<HTMLElement>;
-    style: React.CSSProperties | undefined;
     transform: any;
     transition: any;
     value: ItemType;

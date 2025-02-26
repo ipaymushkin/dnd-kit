@@ -51,7 +51,6 @@ const dropAnimation: DropAnimation = {
 export const Constructor = ({
   customItemHandle = false,
   getContainerStyle = () => ({}),
-  getItemStyles = () => ({}),
   renderItem,
   renderContainer,
   meta,
@@ -264,17 +263,7 @@ export const Constructor = ({
         value={item}
         containerMeta={containerMeta}
         customItemHandle={customItemHandle}
-        style={getItemStyles({
-          container: containerMeta,
-          overIndex: -1,
-          index: getIndex(item.id),
-          item: getItemByItemId(item.id),
-          isSorting: true,
-          isDragging: true,
-          isDragOverlay: true,
-        })}
         dragOverlay
-        itemCardLabelKey={meta.itemCardLabelKey}
       />
     );
   };
@@ -298,16 +287,6 @@ export const Constructor = ({
               value={item}
               container={containerMeta}
               customItemHandle={customItemHandle}
-              style={getItemStyles({
-                container: containerMeta,
-                overIndex: -1,
-                index: getIndex(item[meta.itemUniqKey]),
-                item,
-                isDragging: false,
-                isSorting: false,
-                isDragOverlay: false,
-              })}
-              itemCardLabelKey={meta.itemCardLabelKey}
             />
           );
         })}
@@ -326,7 +305,14 @@ export const Constructor = ({
   }, [items]);
 
   return (
-    <ConstructorContext.Provider value={{ renderItem, renderContainer }}>
+    <ConstructorContext.Provider
+      value={{
+        renderItem,
+        renderContainer,
+        hideColumnRemove,
+        hideColumnSorting,
+      }}
+    >
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetectionStrategy}
@@ -376,8 +362,6 @@ export const Constructor = ({
                   })}
                   onRemove={() => handleRemove(containerId)}
                   onRemoveContainer={onRemoveContainer}
-                  hideColumnSorting={hideColumnSorting}
-                  hideColumnRemove={hideColumnRemove}
                 >
                   <SortableContext
                     items={contextItems}
@@ -391,11 +375,9 @@ export const Constructor = ({
                           disabled={isSortingContainer}
                           index={index}
                           customItemHandle={customItemHandle}
-                          getItemStyles={getItemStyles}
                           getIndex={getIndex}
                           item={value}
                           containerMeta={containerMeta}
-                          itemCardLabelKey={meta.itemCardLabelKey}
                         />
                       );
                     })}

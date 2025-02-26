@@ -17,8 +17,6 @@ export type Props = {
 } & {
   containerMeta: ConfigColumnInterface;
   onRemoveContainer: ConstructorInterface['onRemoveContainer'];
-  hideColumnSorting: ConstructorInterface['hideColumnSorting'];
-  hideColumnRemove: ConstructorInterface['hideColumnRemove'];
 };
 
 export const Container = memo(
@@ -33,13 +31,12 @@ export const Container = memo(
         style,
         containerMeta,
         onRemoveContainer,
-        hideColumnSorting,
-        hideColumnRemove,
         ...props
       }: Props,
       ref,
     ) => {
-      const { renderContainer } = useContext(ConstructorContext);
+      const { renderContainer, hideColumnRemove, hideColumnSorting } =
+        useContext(ConstructorContext);
 
       return (
         <div

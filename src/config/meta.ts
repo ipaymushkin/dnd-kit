@@ -3,7 +3,6 @@ import { ConfigInterface } from './types.ts';
 export const meta: ConfigInterface = {
   columnField: 'status',
   itemUniqKey: 'id',
-  itemCardLabelKey: 'id',
   // groupByField: 'group_id',
   columns: [
     {

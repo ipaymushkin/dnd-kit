@@ -28,11 +28,7 @@ const SortableItem = memo(
     getIndex,
     item,
     containerMeta,
-    getItemStyles,
-    itemCardLabelKey,
   }: SortableItemProps & {
-    getItemStyles: ConstructorInterface['getItemStyles'];
-    itemCardLabelKey?: ConfigInterface['itemCardLabelKey'];
     customItemHandle?: ConstructorInterface['customItemHandle'];
   }) => {
     const {
@@ -63,23 +59,10 @@ const SortableItem = memo(
           customItemHandle ? { ref: setActivatorNodeRef } : undefined
         }
         index={index}
-        style={
-          getItemStyles &&
-          getItemStyles({
-            index,
-            item,
-            isDragging,
-            isSorting,
-            overIndex: over ? getIndex(over.id) : overIndex,
-            container: containerMeta,
-            isDragOverlay: false,
-          })
-        }
         transition={transition}
         transform={transform}
         fadeIn={mountedWhileDragging}
         listeners={listeners}
-        itemCardLabelKey={itemCardLabelKey}
       />
     );
   },
