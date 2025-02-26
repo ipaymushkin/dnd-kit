@@ -3,7 +3,7 @@ import { meta } from './config/meta.ts';
 import { generateItems } from './modules/constructor/utils/generateItems.ts';
 import { useState } from 'react';
 import { groupBy } from 'lodash';
-import { getRandomInt } from './modules/constructor/utils/getRandomInt.ts';
+import './style.css';
 
 const hexToRGB = (hex: string, alpha?: number) => {
   const r = parseInt(hex.slice(1, 3), 16),
@@ -155,21 +155,25 @@ const ConstructorModule = ({ config, items }: any) => {
         disabled,
         handleProps,
       }) => {
+        const styleObj = {
+          background: '#1B1E21',
+          padding: '10px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '8px',
+          width: '100%',
+          cursor: 'pointer',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          marginBottom: '10px',
+        } as React.CSSProperties;
+
+        if (dragging) {
+          styleObj['opacity'] = `0.5`;
+        }
+
         return (
-          <div
-            style={{
-              background: '#1B1E21',
-              padding: '10px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '8px',
-              width: '100%',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px',
-              marginBottom: '10px',
-            }}
-          >
+          <div style={styleObj}>
             <div
               style={{
                 display: 'flex',
