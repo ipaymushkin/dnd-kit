@@ -11,6 +11,8 @@ export interface ConfigColumnInterface {
   value?: string | number;
   // флаг о том что поле является собирательным для значений которые не попали в value
   isCollectively?: boolean;
+  // другие пропсы не участвующие в логике
+  [key: string]: any;
 }
 
 export interface ConfigInterface {

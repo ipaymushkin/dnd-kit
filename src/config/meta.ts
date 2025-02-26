@@ -4,27 +4,32 @@ export const meta: ConfigInterface = {
   columnField: 'status',
   itemUniqKey: 'id',
   itemCardLabelKey: 'id',
-  groupByField: 'group_id',
+  // groupByField: 'group_id',
   columns: [
     {
-      label: 'Первая колонка',
-      value: 'first',
+      label: 'Создано',
+      value: 'created',
+      color: '#6385C7',
     },
     {
-      label: 'Вторая колонка',
-      value: 'second',
+      label: 'В процессе',
+      value: 'in_progress',
+      color: '#FF9F0A',
     },
     {
-      label: 'Третья колонка',
-      value: 'third',
+      label: 'Тестирование',
+      value: 'testing',
+      color: '#64D2FF',
     },
     {
-      label: 'Четвертая колонка',
-      value: 'fourth',
+      label: 'Выполнено',
+      value: 'completed',
+      color: '#30D158',
     },
     {
-      label: 'Остальные',
-      isCollectively: true,
+      label: 'Ревью',
+      value: 'review',
+      color: '#BF5AF2',
     },
   ],
 };

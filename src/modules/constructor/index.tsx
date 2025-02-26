@@ -419,6 +419,6 @@ export const Constructor = ({
 
 const Wrapper = styled.div<{ columns: number }>`
   display: grid;
-  padding: 20px;
   grid-template-columns: repeat(${({ columns }) => columns}, 1fr);
+  column-gap: 10px;
 `;
