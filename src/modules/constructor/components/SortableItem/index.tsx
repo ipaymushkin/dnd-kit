@@ -1,41 +1,28 @@
-import { UniqueIdentifier } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { useMountStatus } from '../../hooks/useMountStatus.ts';
 import { Item } from '../Item';
-import {
-  ConfigColumnInterface,
-  ConstructorInterface,
-  ItemType,
-} from '../../config/types.ts';
+import { ConfigColumnInterface, ItemType } from '../../config/types.ts';
 import { memo, useContext } from 'react';
 import { ConstructorContext } from '../../context.tsx';
 
 interface SortableItemProps {
-  id: UniqueIdentifier;
+  id: string;
   index: number;
   disabled?: boolean;
-  getIndex(id: UniqueIdentifier): number;
   item: ItemType;
   containerMeta: ConfigColumnInterface;
 }
 
 const SortableItem = memo(
-  ({
-    disabled,
-    id,
-    index,
-    getIndex,
-    item,
-    containerMeta,
-  }: SortableItemProps) => {
+  ({ disabled, id, index, item, containerMeta }: SortableItemProps) => {
     const {
       setNodeRef,
       setActivatorNodeRef,
       listeners,
       isDragging,
       isSorting,
-      over,
-      overIndex,
+      // over,
+      // overIndex,
       transform,
       transition,
     } = useSortable({

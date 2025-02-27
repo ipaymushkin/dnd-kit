@@ -359,7 +359,7 @@ const App = () => {
     ),
   );
 
-  const [ready, setReady] = useState<boolean>(true);
+  const [ready, setReady] = useState<boolean>(false);
 
   if (ready) {
     const parsedConfig = JSON.parse(config);

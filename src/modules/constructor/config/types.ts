@@ -1,7 +1,4 @@
-import {
-  type DraggableSyntheticListeners,
-  UniqueIdentifier,
-} from '@dnd-kit/core';
+import { type DraggableSyntheticListeners } from '@dnd-kit/core';
 import React from 'react';
 
 export type AnyType = 'any';
@@ -30,7 +27,7 @@ export interface ConfigInterface {
 
 export type ItemType = { [key: string]: AnyType };
 
-export type ItemsType = Record<UniqueIdentifier, ItemType>;
+export type ItemsType = Record<string, ItemType>;
 
 export interface onElementDragEndInterface {
   container: ConfigColumnInterface;

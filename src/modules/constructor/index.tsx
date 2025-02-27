@@ -30,7 +30,6 @@ import { otherColumnsValue } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
 import {
-  AnyType,
   ConfigColumnInterface,
   ConfigInterface,
   ConstructorInterface,
@@ -63,7 +62,7 @@ export const Constructor = ({
     return groupBy(list, meta.columnField);
   }, [list, meta.columnField]);
 
-  const [items, setItems] = useState<{ [key: string]: ItemsType[] }>(
+  const [items, setItems] = useState<{ [key: string]: ItemType[] }>(
     meta.columns.reduce((previousValue, currentValue) => {
       return Object.assign(previousValue, {
         [`${currentValue.value ?? otherColumnsValue}`]:
@@ -75,7 +74,7 @@ export const Constructor = ({
   const [containers, setContainers] = useState(
     Object.keys(items) as (string | number)[],
   );
-  const [activeEl, setActiveEl] = useState<DndElementInterface>();
+  const [activeEl, setActiveEl] = useState<DndElementInterface | null>();
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
   const isSortingContainer = activeEl
@@ -89,7 +88,9 @@ export const Constructor = ({
     items,
   });
 
-  const [clonedItems, setClonedItems] = useState<ItemsType | null>(null);
+  const [clonedItems, setClonedItems] = useState<{
+    [key: string]: ItemType[];
+  } | null>(null);
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -117,23 +118,10 @@ export const Constructor = ({
       }
 
       return Object.keys(items).find(key =>
-        items[key].find(el => el[meta.itemUniqKey] === id),
+        items[key].find(el => (el[meta.itemUniqKey] as string) === id),
       );
     },
     [items, meta.itemUniqKey],
-  );
-
-  const getIndex = useCallback(
-    (id: AnyType) => {
-      const container = findContainer(id);
-
-      if (!container) {
-        return -1;
-      }
-
-      return items[container].indexOf(id);
-    },
-    [findContainer, items],
   );
 
   const onDragCancel = useCallback(() => {
@@ -146,7 +134,7 @@ export const Constructor = ({
   }, [clonedItems]);
 
   const onDragStart = useCallback(
-    ({ active }: any) => {
+    ({ active }: { active: DndElementInterface }) => {
       setActiveEl(active);
       setClonedItems(items);
     },
@@ -154,15 +142,21 @@ export const Constructor = ({
   );
 
   const onDragOver = useCallback(
-    ({ active, over }: any) => {
+    ({
+      active,
+      over,
+    }: {
+      active: DndElementInterface;
+      over: DndElementInterface;
+    }) => {
       const overId = over?.id;
 
       if (overId == null || active.id in items) {
         return;
       }
 
-      const overContainer = findContainer(overId);
-      const activeContainer = findContainer(active.id);
+      const overContainer = findContainer(overId as string);
+      const activeContainer = findContainer(active.id as string);
 
       if (!overContainer || !activeContainer) {
         return;
@@ -388,7 +382,6 @@ export const Constructor = ({
                           id={value[meta.itemUniqKey]}
                           disabled={isSortingContainer}
                           index={index}
-                          getIndex={getIndex}
                           item={value}
                           containerMeta={containerMeta}
                         />
