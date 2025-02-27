@@ -4,6 +4,7 @@ import { generateItems } from './modules/constructor/utils/generateItems.ts';
 import { useCallback, useState } from 'react';
 import { groupBy } from 'lodash';
 import './style.css';
+import { ConfigColumnInterface } from './config/types.ts';
 
 const hexToRGB = (hex: string, alpha?: number) => {
   const r = parseInt(hex.slice(1, 3), 16),
@@ -256,10 +257,42 @@ const ConstructorModule = ({ config, items }: any) => {
             >
               {containerMeta.label}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <AddIcon />
-              <MoreIcon />
-              <div {...handleProps}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div
+                style={{
+                  width: '25px',
+                  height: '25px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <AddIcon />
+              </div>
+              <div
+                style={{
+                  width: '25px',
+                  height: '25px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <MoreIcon />
+              </div>
+              <div
+                style={{
+                  width: '25px',
+                  height: '25px',
+                  cursor: 'grab',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                {...handleProps}
+              >
                 <HandleIcon />
               </div>
             </div>
@@ -274,12 +307,25 @@ const ConstructorModule = ({ config, items }: any) => {
     [],
   );
 
+  const onContainerDragEnd = useCallback((container: ConfigColumnInterface) => {
+    console.log('onContainerDragEnd', container);
+  }, []);
+
+  const onElementDragEnd = useCallback(
+    ({ container, element, oldIndex, newIndex }: any) => {
+      console.log(container, element, oldIndex, newIndex);
+    },
+    [],
+  );
+
   return (
     <Constructor
       meta={config}
       list={items}
       renderItem={renderItem}
       renderContainer={renderContainer}
+      onContainerDragEnd={onContainerDragEnd}
+      onElementDragEnd={onElementDragEnd}
     />
   );
 };

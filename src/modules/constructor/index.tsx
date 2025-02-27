@@ -54,6 +54,8 @@ export const Constructor = ({
   renderContainer,
   meta,
   list,
+  onContainerDragEnd,
+  onElementDragEnd,
 }: ConstructorInterface & { meta: ConfigInterface; list: ItemsType[] }) => {
   const groupedList = useMemo(() => {
     return groupBy(list, meta.columnField);
@@ -223,6 +225,9 @@ export const Constructor = ({
 
           return arrayMove(containers, activeIndex, overIndex);
         });
+        onContainerDragEnd?.(
+          getContainerMetaByContainerId(findContainer(active.id)),
+        );
       }
 
       const activeContainer = findContainer(active.id);
@@ -242,12 +247,24 @@ export const Constructor = ({
       const overContainer = findContainer(overId);
 
       if (overContainer) {
+        const element = items[activeContainer].find(
+          el => el[meta.itemUniqKey] === active.id,
+        );
         const activeIndex = items[activeContainer].findIndex(
           el => el[meta.itemUniqKey] === active.id,
         );
         const overIndex = items[overContainer].findIndex(
           el => el[meta.itemUniqKey] === overId,
         );
+
+        onElementDragEnd?.({
+          container: getContainerMetaByContainerId(
+            findContainer(overContainer),
+          ),
+          oldIndex: activeIndex,
+          newIndex: overIndex,
+          element,
+        });
 
         if (activeIndex !== overIndex) {
           setItems(items => ({

@@ -52,4 +52,11 @@ export interface ConstructorInterface {
     onRemove: VoidFunction;
     children: any;
   }) => React.ReactElement;
+  onContainerDragEnd?: (value: ConfigColumnInterface) => void;
+  onElementDragEnd?: (args: {
+    container: ConfigColumnInterface;
+    element: ItemType;
+    oldIndex: number;
+    newIndex: number;
+  }) => void;
 }
