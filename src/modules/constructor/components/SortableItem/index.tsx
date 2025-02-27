@@ -6,7 +6,7 @@ import {
   ConfigColumnInterface,
   ConstructorInterface,
   ItemType,
-} from '../../../../config/types.ts';
+} from '../../config/types.ts';
 import { memo, useContext } from 'react';
 import { ConstructorContext } from '../../context.tsx';
 

@@ -7,7 +7,7 @@ import { Container, ContainerProps } from '../Container';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { memo } from 'react';
 import { CSS } from '@dnd-kit/utilities';
-import { ItemsType } from '../../../../config/types.ts';
+import { ItemsType } from '../../config/types.ts';
 
 const animateLayoutChanges: AnimateLayoutChanges = args =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });

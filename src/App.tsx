@@ -1,10 +1,17 @@
 import { Constructor } from './modules/constructor';
-import { meta } from './config/meta.ts';
+import { meta } from './modules/constructor/config/meta.ts';
 import { generateItems } from './modules/constructor/utils/generateItems.ts';
 import { useCallback, useState } from 'react';
 import { groupBy } from 'lodash';
 import './style.css';
-import { ConfigColumnInterface } from './config/types.ts';
+import {
+  ConfigColumnInterface,
+  ConfigInterface,
+  ItemType,
+  onElementDragEndInterface,
+  renderContainerInterface,
+  renderItemInterface,
+} from './modules/constructor/config/types.ts';
 
 const hexToRGB = (hex: string, alpha?: number) => {
   const r = parseInt(hex.slice(1, 3), 16),
@@ -132,7 +139,7 @@ const descriptions = [
   'Разработать дизайн',
 ];
 
-const TypeStr = ({ variant }: { variant: 0 | 1 | 2 }) => {
+const TypeStr = ({ variant }: { variant: number }) => {
   let label: string, color: string;
   if (variant === 0) {
     label = 'Разработка';
@@ -147,23 +154,28 @@ const TypeStr = ({ variant }: { variant: 0 | 1 | 2 }) => {
   return <div style={{ fontSize: '12px', color }}>{label}</div>;
 };
 
-const ConstructorModule = ({ config, items }: any) => {
+const ConstructorModule = ({
+  config,
+  items,
+}: {
+  config: ConfigInterface;
+  items: ItemType[];
+}) => {
   const renderItem = useCallback(
     ({
       value,
-      transition,
-      transform,
-      ref,
-      index,
-      listeners,
-      style,
-      fadeIn,
-      sorting,
-      dragOverlay,
+      // transition,
+      // transform,
+      // ref,
+      // index,
+      // listeners,
+      // fadeIn,
+      // sorting,
+      // dragOverlay,
       dragging,
-      disabled,
-      handleProps,
-    }: any) => {
+      // disabled,
+      // handleProps,
+    }: renderItemInterface) => {
       const styleObj = {
         background: '#1B1E21',
         padding: '10px',
@@ -231,7 +243,12 @@ const ConstructorModule = ({ config, items }: any) => {
   );
 
   const renderContainer = useCallback(
-    ({ containerMeta, handleProps, onRemove, children }: any) => {
+    ({
+      containerMeta,
+      handleProps,
+      // onRemove,
+      children,
+    }: renderContainerInterface) => {
       return (
         <div>
           <div
@@ -312,7 +329,7 @@ const ConstructorModule = ({ config, items }: any) => {
   }, []);
 
   const onElementDragEnd = useCallback(
-    ({ container, element, oldIndex, newIndex }: any) => {
+    ({ container, element, oldIndex, newIndex }: onElementDragEndInterface) => {
       console.log(container, element, oldIndex, newIndex);
     },
     [],
@@ -352,7 +369,7 @@ const App = () => {
       return (
         <>
           {Object.keys(groups).map(group => {
-            const groupedItems = groups[group];
+            const groupedItems = groups[group] as ItemType[];
             return (
               <div key={`group_${group}`}>
                 <div>Группа с ID {group}</div>

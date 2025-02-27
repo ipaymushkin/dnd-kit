@@ -2,7 +2,7 @@ import { forwardRef, memo, useContext, useEffect, useMemo } from 'react';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 
-import { ConfigColumnInterface, ItemType } from '../../../../config/types.ts';
+import { ConfigColumnInterface, ItemType } from '../../config/types.ts';
 import { ConstructorContext } from '../../context.tsx';
 
 type Props = {

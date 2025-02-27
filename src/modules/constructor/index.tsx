@@ -30,12 +30,14 @@ import { otherColumnsValue } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
 import {
+  AnyType,
   ConfigColumnInterface,
   ConfigInterface,
   ConstructorInterface,
+  DndElementInterface,
   ItemsType,
   ItemType,
-} from '../../config/types.ts';
+} from './config/types.ts';
 import { ConstructorContext } from './context.tsx';
 
 const dropAnimation: DropAnimation = {
@@ -71,9 +73,9 @@ export const Constructor = ({
   );
 
   const [containers, setContainers] = useState(
-    Object.keys(items) as UniqueIdentifier[],
+    Object.keys(items) as (string | number)[],
   );
-  const [activeEl, setActiveEl] = useState<any>();
+  const [activeEl, setActiveEl] = useState<DndElementInterface>();
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
   const isSortingContainer = activeEl
@@ -109,7 +111,7 @@ export const Constructor = ({
   );
 
   const findContainer = useCallback(
-    (id: UniqueIdentifier) => {
+    (id: string) => {
       if (id in items) {
         return id;
       }
@@ -122,7 +124,7 @@ export const Constructor = ({
   );
 
   const getIndex = useCallback(
-    (id: UniqueIdentifier) => {
+    (id: AnyType) => {
       const container = findContainer(id);
 
       if (!container) {

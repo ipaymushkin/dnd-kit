@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useContext } from 'react';
-import { ConfigColumnInterface } from '../../../../config/types.ts';
+import { ConfigColumnInterface } from '../../config/types.ts';
 import { ConstructorContext } from '../../context.tsx';
 
 export type Props = {

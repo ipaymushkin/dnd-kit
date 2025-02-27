@@ -1,4 +1,4 @@
-import { ConfigInterface } from '../../../config/types.ts';
+import { ConfigInterface } from '../config/types.ts';
 
 export const getColumnsFromMeta = (meta: ConfigInterface) => {
   const set = new Set();

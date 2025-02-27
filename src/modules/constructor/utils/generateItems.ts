@@ -1,4 +1,4 @@
-import { ConfigInterface } from '../../../config/types.ts';
+import { ConfigInterface } from '../config/types.ts';
 import { getColumnsFromMeta } from './getColumnsFromMeta.ts';
 import { otherColumnsValue } from '../const.ts';
 import { getRandomInt } from './getRandomInt.ts';

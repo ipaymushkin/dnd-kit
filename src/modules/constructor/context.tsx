@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { ConstructorInterface } from '../../config/types.ts';
+import { ConstructorInterface } from './config/types.ts';
 
 export const ConstructorContext = createContext<
   Pick<
