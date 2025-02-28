@@ -4,10 +4,9 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { Container, ContainerProps } from '../Container';
-import { UniqueIdentifier } from '@dnd-kit/core';
 import { memo } from 'react';
 import { CSS } from '@dnd-kit/utilities';
-import { ItemsType } from '../../config/types.ts';
+import { AnyType, ItemsType } from '../../config/types.ts';
 
 const animateLayoutChanges: AnimateLayoutChanges = args =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
@@ -21,7 +20,7 @@ const DroppableContainer = memo(
     ...props
   }: ContainerProps & {
     disabled?: boolean;
-    id: UniqueIdentifier;
+    id: string;
     items: ItemsType[];
   }) => {
     const {
@@ -43,7 +42,7 @@ const DroppableContainer = memo(
     });
     const isOverContainer = over
       ? (id === over.id && active?.data.current?.type !== 'container') ||
-        items.includes(over.id)
+        items.includes(over.id as AnyType)
       : false;
 
     return (

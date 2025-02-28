@@ -30,6 +30,7 @@ import { otherColumnsValue } from './const.ts';
 import { DroppableContainer } from './components/DroppableContainer';
 import { SortableItem } from './components/SortableItem';
 import {
+  AnyType,
   ConfigColumnInterface,
   ConfigInterface,
   ConstructorInterface,
@@ -101,7 +102,7 @@ export const Constructor = ({
   );
 
   const getContainerMetaByContainerId = useCallback(
-    (containerId: UniqueIdentifier) => {
+    (containerId: string) => {
       return containerId === otherColumnsValue
         ? meta.columns.find(el => el.isCollectively)
         : (meta.columns.find(
@@ -114,12 +115,12 @@ export const Constructor = ({
   const findContainer = useCallback(
     (id: string) => {
       if (id in items) {
-        return id;
+        return id as string;
       }
 
-      return Object.keys(items).find(key =>
-        items[key].find(el => (el[meta.itemUniqKey] as string) === id),
-      );
+      return Object.keys(items).find(
+        key => !!items[key].find(el => (el[meta.itemUniqKey] as string) === id),
+      ) as string;
     },
     [items, meta.itemUniqKey],
   );
@@ -213,7 +214,13 @@ export const Constructor = ({
   );
 
   const onDragEnd = useCallback(
-    ({ active, over }: any) => {
+    ({
+      active,
+      over,
+    }: {
+      active: DndElementInterface;
+      over: DndElementInterface;
+    }) => {
       if (active.id in items && over?.id) {
         setContainers(containers => {
           const activeIndex = containers.indexOf(active.id);
@@ -222,11 +229,11 @@ export const Constructor = ({
           return arrayMove(containers, activeIndex, overIndex);
         });
         onContainerDragEnd?.(
-          getContainerMetaByContainerId(findContainer(active.id)),
+          getContainerMetaByContainerId(findContainer(active.id as string)),
         );
       }
 
-      const activeContainer = findContainer(active.id);
+      const activeContainer = findContainer(active.id as string);
 
       if (!activeContainer) {
         setActiveEl(null);
@@ -240,7 +247,7 @@ export const Constructor = ({
         return;
       }
 
-      const overContainer = findContainer(overId);
+      const overContainer = findContainer(overId as string);
 
       if (overContainer) {
         const element = items[activeContainer].find(
@@ -283,15 +290,17 @@ export const Constructor = ({
     (item: ItemType) => {
       const containerMeta = getContainerMetaByContainerId(
         findContainer(item.id),
-      );
-      return <Item value={item} containerMeta={containerMeta} dragOverlay />;
+      ) as ConfigColumnInterface;
+      return <Item value={item} container={containerMeta} dragOverlay />;
     },
     [findContainer, getContainerMetaByContainerId],
   );
 
   const renderContainerDragOverlay = useCallback(
-    (container: any) => {
-      const containerMeta = getContainerMetaByContainerId(container.id);
+    (container: DndElementInterface) => {
+      const containerMeta = getContainerMetaByContainerId(
+        container.id as string,
+      );
       if (!containerMeta) return null;
       return (
         <Container containerMeta={containerMeta}>
@@ -337,8 +346,8 @@ export const Constructor = ({
           },
         }}
         onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDragEnd={onDragEnd}
+        onDragOver={onDragOver as AnyType}
+        onDragEnd={onDragEnd as AnyType}
         onDragCancel={onDragCancel}
       >
         <div
@@ -352,8 +361,10 @@ export const Constructor = ({
             items={containers}
             strategy={horizontalListSortingStrategy}
           >
-            {containers.map((containerId, idx: number) => {
-              const containerMeta = getContainerMetaByContainerId(containerId);
+            {containers.map(containerId => {
+              const containerMeta = getContainerMetaByContainerId(
+                containerId as string,
+              );
 
               if (!containerMeta) {
                 return <div>Проблема с колонкой {containerId}</div>;
@@ -361,7 +372,7 @@ export const Constructor = ({
 
               const contextItems = items[containerId].map(el => ({
                 id: el[meta.itemUniqKey],
-              })) as any[];
+              })) as { id: string }[];
 
               return (
                 <DroppableContainer

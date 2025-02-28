@@ -8,6 +8,7 @@ export type Props = {
   handleProps?: React.HTMLAttributes<any>;
   onClick?: () => void;
   onRemove?: () => void;
+  hover?: boolean;
 } & {
   containerMeta: ConfigColumnInterface;
 };
@@ -22,6 +23,7 @@ export const Container = memo(
         onRemove,
         style,
         containerMeta,
+        hover,
         ...props
       }: Props,
       ref,
@@ -36,7 +38,13 @@ export const Container = memo(
           onClick={onClick}
           tabIndex={onClick ? 0 : undefined}
         >
-          {renderContainer({ containerMeta, handleProps, onRemove, children })}
+          {renderContainer({
+            containerMeta,
+            handleProps,
+            onRemove,
+            children,
+            hover,
+          })}
         </div>
       );
     },

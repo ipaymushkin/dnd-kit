@@ -2,14 +2,18 @@ import { forwardRef, memo, useContext, useEffect, useMemo } from 'react';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 
-import { ConfigColumnInterface, ItemType } from '../../config/types.ts';
+import {
+  AnyType,
+  ConfigColumnInterface,
+  ItemType,
+} from '../../config/types.ts';
 import { ConstructorContext } from '../../context.tsx';
 
 type Props = {
   dragOverlay?: boolean;
   disabled?: boolean;
   dragging?: boolean;
-  handleProps?: any;
+  handleProps?: AnyType;
   height?: number;
   index?: number;
   fadeIn?: boolean;
@@ -71,7 +75,7 @@ export const Item = memo(
             touchAction: 'manipulation',
             transform: transformStr,
           }}
-          ref={ref}
+          ref={ref as AnyType}
           data-cypress="draggable-item"
           {...(!customItemHandle ? listeners : undefined)}
           {...props}
