@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import { groupBy } from 'lodash';
 import './style.css';
 import {
+  AnyType,
   ConfigColumnInterface,
   ConfigInterface,
   ItemType,
@@ -341,7 +342,7 @@ const ConstructorModule = ({
       list={items}
       renderItem={renderItem}
       renderContainer={renderContainer}
-      onContainerDragEnd={onContainerDragEnd}
+      onContainerDragEnd={onContainerDragEnd as AnyType}
       onElementDragEnd={onElementDragEnd}
     />
   );
@@ -351,13 +352,8 @@ const App = () => {
   const [config, setConfig] = useState<string>(
     JSON.stringify(meta, undefined, 4),
   );
-  const [items, setItems] = useState<string>(
-    JSON.stringify(
-      generateItems({ meta: JSON.parse(config), count: 50 }),
-      undefined,
-      4,
-    ),
-  );
+
+  const [items, setItems] = useState<string>('');
 
   const [ready, setReady] = useState<boolean>(false);
 
@@ -372,7 +368,7 @@ const App = () => {
             const groupedItems = groups[group] as ItemType[];
             return (
               <div key={`group_${group}`}>
-                <div>Группа с ID {group}</div>
+                <div style={{ marginBottom: '10px' }}>Группа с ID {group}</div>
                 <ConstructorModule config={parsedConfig} items={groupedItems} />
               </div>
             );

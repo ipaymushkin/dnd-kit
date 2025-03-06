@@ -378,7 +378,7 @@ export const Constructor = ({
                 <DroppableContainer
                   containerMeta={containerMeta}
                   key={`droppable_${containerId}`}
-                  id={containerId}
+                  id={containerId as string}
                   items={items[containerId]}
                   onRemove={() => handleRemove(containerId)}
                 >

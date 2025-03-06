@@ -19,7 +19,7 @@ export const generateItems = ({
     .fill(0)
     .map((_, idx: number) => {
       const el = {
-        id: idx,
+        [meta.itemUniqKey]: idx,
         [meta.columnField]: columns[getRandomInt(columns.length)],
       };
       if (meta.groupByField) {
