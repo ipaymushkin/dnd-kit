@@ -6,6 +6,7 @@ import {
   rectIntersection,
 } from '@dnd-kit/core';
 import { useCallback } from 'react';
+import { throttle } from 'lodash';
 
 export const useCollisionDetectionStrategy = ({
   activeId,
@@ -69,5 +70,7 @@ export const useCollisionDetectionStrategy = ({
     [activeId, items],
   );
 
-  return { collisionDetectionStrategy };
+  return {
+    collisionDetectionStrategy: throttle(collisionDetectionStrategy, 100),
+  };
 };

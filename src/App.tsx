@@ -331,7 +331,7 @@ const ConstructorModule = ({
 
   const onElementDragEnd = useCallback(
     ({ container, element, oldIndex, newIndex }: onElementDragEndInterface) => {
-      console.log(container, element, oldIndex, newIndex);
+      console.log('onElementDragEnd', container, element, oldIndex, newIndex);
     },
     [],
   );
@@ -426,7 +426,7 @@ const App = () => {
         onClick={() => {
           setItems(
             JSON.stringify(
-              generateItems({ meta: JSON.parse(config), count: 50 }),
+              generateItems({ meta: JSON.parse(config), count: 1000 }),
               undefined,
               4,
             ),
